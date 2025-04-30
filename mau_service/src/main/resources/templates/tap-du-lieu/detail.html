@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head}"></head>
+<body>
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+
+<div class="container mt-4">
+    <div class="page-header d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-database text-primary me-2"></i>Chi tiết Tập Dữ Liệu</h2>
+        <div>
+            <a th:href="@{/tap-du-lieu}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Quay lại
+            </a>
+            <a th:href="@{/tap-du-lieu/chinh-sua/{id}(id=${tapDuLieu.id})}" class="btn btn-warning">
+                <i class="fas fa-edit me-2"></i>Chỉnh sửa
+            </a>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0" th:text="${tapDuLieu.ten}"></h5>
+            <span class="badge bg-info" th:text="${tapDuLieu.loai}"></span>
+        </div>
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <p><strong><i class="fas fa-hashtag me-2"></i>ID:</strong> <span th:text="${tapDuLieu.id}"></span></p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong><i class="fas fa-file-alt me-2"></i>Mô tả:</strong></p>
+                    <div class="description-box p-3 bg-light rounded">
+                        <p th:text="${tapDuLieu.moTa != null && !tapDuLieu.moTa.isEmpty() ? tapDuLieu.moTa : 'Không có mô tả'}"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3><i class="fas fa-list text-primary me-2"></i>Danh sách mẫu</h3>
+        <a th:href="@{/tap-du-lieu/chinh-sua/{id}(id=${tapDuLieu.id})}" class="btn btn-primary">
+            <i class="fas fa-edit me-2"></i>Quản lý mẫu
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-header bg-light">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Mẫu bạo lực trong tập dữ liệu</h5>
+                <span class="badge bg-primary" th:text="${#lists.size(danhSachMau) + ' mẫu'}"></span>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="input-group p-3">
+                <span class="input-group-text"><i class="fas fa-search"></i></span>
+                <input type="text" class="form-control" id="searchInput" placeholder="Tìm kiếm theo tên hoặc nhãn...">
+            </div>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover mb-0">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Tên</th>
+                        <th>Nhãn</th>
+                        <th class="text-center">Thao tác</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="mau : ${danhSachMau}" class="mau-item">
+                        <td th:text="${mau.id}"></td>
+                        <td class="mau-ten" th:text="${mau.ten}"></td>
+                        <td>
+                            <span class="badge bg-primary mau-nhan" th:text="${mau.nhan}"></span>
+                        </td>
+                        <td class="text-center">
+                            <a th:href="@{/mau-bao-luc/{id}(id=${mau.id})}" class="btn btn-sm btn-info" title="Xem chi tiết">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(danhSachMau)}">
+                        <td colspan="4" class="text-center py-4">
+                            <i class="fas fa-film fa-2x text-muted mb-3"></i>
+                            <p class="text-muted">Không có mẫu nào trong tập dữ liệu này</p>
+                            <a th:href="@{/tap-du-lieu/chinh-sua/{id}(id=${tapDuLieu.id})}" class="btn btn-sm btn-primary mt-2">
+                                <i class="fas fa-plus me-2"></i>Thêm mẫu
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer" th:if="${!#lists.isEmpty(danhSachMau)}">
+            <div class="text-muted small">
+                <i class="fas fa-info-circle me-1"></i> Để thêm hoặc xóa mẫu, nhấn nút "Quản lý mẫu" phía trên
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Tìm kiếm trong danh sách mẫu
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                const searchText = this.value.toLowerCase();
+                const rows = document.querySelectorAll('.mau-item');
+
+                rows.forEach(row => {
+                    const ten = row.querySelector('.mau-ten').textContent.toLowerCase();
+                    const nhan = row.querySelector('.mau-nhan').textContent.toLowerCase();
+
+                    if (ten.includes(searchText) || nhan.includes(searchText)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        }
+    });
+</script>
+</body>
+</html>

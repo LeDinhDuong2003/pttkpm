@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head}"></head>
+<body>
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+
+<div class="container mt-4">
+    <div class="page-header d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-edit text-warning me-2"></i>Chỉnh sửa Mẫu Bạo Lực</h2>
+        <a th:href="@{/mau-bao-luc/{id}(id=${mauBaoLuc.id})}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Quay lại
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-edit me-2"></i>Thông tin mẫu bạo lực</h5>
+        </div>
+        <div class="card-body">
+            <form th:action="@{/mau-bao-luc/chinh-sua/{id}(id=${mauBaoLuc.id})}" method="post" enctype="multipart/form-data" th:object="${mauBaoLuc}" class="needs-validation" novalidate>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="ten" class="form-label">Tên <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-heading"></i></span>
+                            <input type="text" class="form-control" id="ten" th:field="*{ten}" required>
+                        </div>
+                        <div class="invalid-feedback">Vui lòng nhập tên mẫu bạo lực</div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="nhan" class="form-label">Nhãn <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-tag"></i></span>
+                            <input type="text" class="form-control" id="nhan" th:field="*{nhan}" required>
+                        </div>
+                        <div class="invalid-feedback">Vui lòng nhập nhãn</div>
+                        <small class="form-text text-muted">Nhãn phân loại, ví dụ: danh_nhau, vung_vay, v.v.</small>
+                    </div>
+
+                    <div class="col-12 mb-3">
+                        <label for="moTa" class="form-label">Mô tả</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-align-left"></i></span>
+                            <textarea class="form-control" id="moTa" th:field="*{moTa}" rows="4"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="col-12 mb-4">
+                        <label for="videoFile" class="form-label">File Video</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-file-video"></i></span>
+                            <input type="file" class="form-control" id="videoFile" name="videoFile" accept="video/*">
+                        </div>
+                        <small class="form-text text-muted">Để trống nếu không muốn cập nhật video.</small>
+                    </div>
+
+                    <div class="col-12 mb-4" th:if="${mauBaoLuc.duongDanVideo != null}">
+                        <label class="form-label">Video hiện tại</label>
+                        <div class="video-current">
+                            <video width="320" height="240" controls class="rounded shadow-sm">
+                                <source th:src="${mauBaoLuc.duongDanVideo}" type="video/mp4">
+                                Trình duyệt của bạn không hỗ trợ thẻ video.
+                            </video>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                    <button type="submit" class="btn btn-primary px-4">
+                        <i class="fas fa-save me-2"></i>Lưu thay đổi
+                    </button>
+                    <a th:href="@{/mau-bao-luc/{id}(id=${mauBaoLuc.id})}" class="btn btn-secondary px-4">
+                        <i class="fas fa-times me-2"></i>Hủy
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+</body>
+</html>

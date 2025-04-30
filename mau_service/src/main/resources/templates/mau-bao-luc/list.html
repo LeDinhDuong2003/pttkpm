@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head}"></head>
+<body>
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+
+<div class="container mt-4">
+    <div class="page-header d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-film text-primary me-2"></i>Danh sách Mẫu Bạo Lực</h2>
+        <a th:href="@{/mau-bao-luc/them-moi}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Thêm mới
+        </a>
+    </div>
+
+    <div class="card mb-4 search-card">
+        <div class="card-header">
+            <h5><i class="fas fa-search me-2"></i>Tìm kiếm</h5>
+        </div>
+        <div class="card-body">
+            <form th:action="@{/mau-bao-luc}" method="get" class="row g-3">
+                <div class="col-md-6">
+                    <label for="nhan" class="form-label">Nhãn</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-tag"></i></span>
+                        <input type="text" class="form-control" id="nhan" name="nhan" th:value="${nhan}"
+                               placeholder="Nhập nhãn để tìm kiếm...">
+                    </div>
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search me-1"></i>Tìm kiếm
+                    </button>
+                    <a th:href="@{/mau-bao-luc}" class="btn btn-secondary">
+                        <i class="fas fa-sync-alt me-1"></i>Reset
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover mb-0">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Tên</th>
+                        <th>Nhãn</th>
+                        <th class="text-center">Thao tác</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="mau : ${mauBaoLucs}">
+                        <td th:text="${mau.id}"></td>
+                        <td th:text="${mau.ten}"></td>
+                        <td>
+                            <span class="badge bg-primary" th:text="${mau.nhan}"></span>
+                        </td>
+                        <td class="text-center">
+                            <div class="btn-group">
+                                <a th:href="@{/mau-bao-luc/{id}(id=${mau.id})}" class="btn btn-sm btn-info" title="Xem chi tiết">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a th:href="@{/mau-bao-luc/chinh-sua/{id}(id=${mau.id})}" class="btn btn-sm btn-warning" title="Chỉnh sửa">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a th:href="@{/mau-bao-luc/xoa/{id}(id=${mau.id})}" class="btn btn-sm btn-danger" title="Xóa"
+                                   onclick="return confirm('Bạn có chắc chắn muốn xóa mẫu này?')">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(mauBaoLucs)}">
+                        <td colspan="5" class="text-center py-4">
+                            <i class="fas fa-search fa-2x text-muted mb-3"></i>
+                            <p class="text-muted">Không tìm thấy mẫu bạo lực nào</p>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Phân trang -->
+    <nav th:if="${tongSoTrang != null && tongSoTrang > 0}" class="mt-4">
+        <ul class="pagination justify-content-center">
+            <li class="page-item" th:classappend="${trangHienTai == 0 ? 'disabled' : ''}">
+                <a class="page-link" th:href="@{/mau-bao-luc(trang=${trangHienTai - 1}, nhan=${nhan})}">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            </li>
+            <li class="page-item" th:each="i : ${#numbers.sequence(0, tongSoTrang - 1)}"
+                th:classappend="${i == trangHienTai ? 'active' : ''}">
+                <a class="page-link" th:href="@{/mau-bao-luc(trang=${i}, nhan=${nhan})}" th:text="${i + 1}"></a>
+            </li>
+            <li class="page-item" th:classappend="${trangHienTai == tongSoTrang - 1 ? 'disabled' : ''}">
+                <a class="page-link" th:href="@{/mau-bao-luc(trang=${trangHienTai + 1}, nhan=${nhan})}">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+</body>
+</html>

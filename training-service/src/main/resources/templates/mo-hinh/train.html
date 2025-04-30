@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head}"></head>
+<body>
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+
+<div class="container mt-4">
+    <div class="page-header d-flex justify-content-between align-items-center mb-4">
+        <h2 th:if="${isNew}"><i class="fas fa-plus-circle text-primary me-2"></i>Tạo mô hình mới</h2>
+        <h2 th:unless="${isNew}"><i class="fas fa-play text-success me-2"></i>Huấn luyện mô hình</h2>
+        <a th:href="${isNew ? '/mo-hinh' : '/mo-hinh/' + moHinh.id}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Quay lại
+        </a>
+    </div>
+
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i><span th:text="${errorMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0" th:if="${isNew}"><i class="fas fa-cog me-2"></i>Thông tin mô hình</h5>
+            <h5 class="mb-0" th:unless="${isNew}"><i class="fas fa-sliders-h me-2"></i>Thông số huấn luyện</h5>
+        </div>
+        <div class="card-body">
+            <form th:action="${isNew ? '/mo-hinh/them-moi' : '/mo-hinh/huan-luyen/' + moHinh.id}" method="post" th:object="${moHinh}" onsubmit="return validateForm()">
+                <input type="hidden" th:if="${!isNew}" th:field="*{id}" id="moHinhId">
+
+                <div th:if="${isNew}" class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="ten" class="form-label">Tên mô hình<span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="ten" th:field="*{ten}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="loaiMoHinh" class="form-label">Loại mô hình<span class="text-danger">*</span></label>
+                            <select class="form-select" id="loaiMoHinh" th:field="*{loaiMoHinh.id}" required>
+                                <option value="">-- Chọn loại mô hình --</option>
+                                <option th:each="loai : ${loaiMoHinhs}"
+                                        th:value="${loai.id}"
+                                        th:text="${loai.ten}"></option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="mucDich" class="form-label">Mục đích huấn luyện<span class="text-danger">*</span></label>
+                            <select class="form-select" id="mucDich" th:field="*{mucDich}" required>
+                                <option value="">-- Chọn mục đích --</option>
+                                <option value="PHAT_HIEN_BAO_LUC">Phát hiện bạo lực</option>
+                                <option value="NHAN_DANG_VUNG_CHUA">Nhận dạng vùng chứa</option>
+                                <option value="NHAN_DANG_CHUYEN_DONG">Nhận dạng chuyển động</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="tapDuLieu" class="form-label">Tập dữ liệu<span class="text-danger">*</span></label>
+                            <select class="form-select" id="tapDuLieu" th:field="*{tapDuLieu.id}" required>
+                                <option value="">-- Chọn tập dữ liệu --</option>
+                                <option th:each="tapDL : ${tapDuLieus}"
+                                        th:value="${tapDL.id}"
+                                        th:text="${tapDL.ten}"></option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="phienBan" class="form-label">Phiên bản</label>
+                            <input type="text" class="form-control" id="phienBan" th:field="*{phienBan}" placeholder="1.0.0">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="moTa" class="form-label">Mô tả</label>
+                            <textarea class="form-control" id="moTa" th:field="*{moTa}" rows="4" placeholder="Mô tả chi tiết về mô hình"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <h5 class="border-bottom pb-2 mb-3"><i class="fas fa-cogs me-2"></i>Thông số huấn luyện</h5>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+<!--                        <div class="mb-3">-->
+<!--                            <label for="epochs" class="form-label">Số epochs</label>-->
+<!--                            <input type="number" class="form-control" id="epochs" th:field="*{thongSoForm.epochs}" min="1" max="1000">-->
+<!--                        </div>-->
+
+<!--                        <div class="mb-3">-->
+<!--                            <label for="batchSize" class="form-label">Batch size</label>-->
+<!--                            <input type="number" class="form-control" id="batchSize" th:field="*{thongSoForm.batchSize}" min="1" max="512">-->
+<!--                        </div>-->
+
+<!--                        <div class="mb-3">-->
+<!--                            <label for="optimizer" class="form-label">Optimizer</label>-->
+<!--                            <select class="form-select" id="optimizer" th:field="*{thongSoForm.optimizer}">-->
+<!--                                <option value="adam">Adam</option>-->
+<!--                                <option value="sgd">SGD</option>-->
+<!--                                <option value="rmsprop">RMSprop</option>-->
+<!--                                <option value="adagrad">Adagrad</option>-->
+<!--                            </select>-->
+<!--                        </div>-->
+                    </div>
+
+<!--                    <div class="col-md-6">-->
+<!--                        <div class="mb-3">-->
+<!--                            <label for="learningRate" class="form-label">Learning rate</label>-->
+<!--                            <input type="number" class="form-control" id="learningRate" th:field="*{thongSoForm.learningRate}" step="0.0001" min="0.0001" max="1">-->
+<!--                        </div>-->
+
+<!--                        <div class="mb-3">-->
+<!--                            <label for="valSplit" class="form-label">Tỷ lệ validation split</label>-->
+<!--                            <input type="number" class="form-control" id="valSplit" th:field="*{thongSoForm.valSplit}" step="0.01" min="0.1" max="0.5">-->
+<!--                        </div>-->
+
+<!--                        <div class="mb-3">-->
+<!--                            <label for="lossFunction" class="form-label">Hàm loss</label>-->
+<!--                            <select class="form-select" id="lossFunction" th:field="*{thongSoForm.lossFunction}">-->
+<!--                                <option value="categorical_crossentropy">Categorical Crossentropy</option>-->
+<!--                                <option value="binary_crossentropy">Binary Crossentropy</option>-->
+<!--                                <option value="mse">Mean Squared Error</option>-->
+<!--                                <option value="mae">Mean Absolute Error</option>-->
+<!--                            </select>-->
+<!--                        </div>-->
+<!--                    </div>-->
+                </div>
+
+                <div class="form-check mb-3">
+<!--                    <input class="form-check-input" type="checkbox" id="usePretrainedModel" th:field="*{thongSoForm.usePretrainedModel}">-->
+<!--                    <label class="form-check-label" for="usePretrainedModel">-->
+<!--                        Sử dụng mô hình đã huấn luyện trước (Transfer learning)-->
+<!--                    </label>-->
+                </div>
+
+<!--                <div class="mb-4" id="pretrainedModelSection" th:style="${moHinh.thongSoForm.usePretrainedModel ? '' : 'display: none;'}">-->
+<!--                    <label for="pretrainedModelName" class="form-label">Tên mô hình pre-trained</label>-->
+<!--                    <select class="form-select" id="pretrainedModelName" th:field="*{thongSoForm.pretrainedModelName}">-->
+<!--                        <option value="VGG16">VGG16</option>-->
+<!--                        <option value="VGG19">VGG19</option>-->
+<!--                        <option value="ResNet50">ResNet50</option>-->
+<!--                        <option value="MobileNetV2">MobileNetV2</option>-->
+<!--                        <option value="EfficientNetB0">EfficientNetB0</option>-->
+<!--                    </select>-->
+<!--                </div>-->
+
+                <div class="d-flex justify-content-between mt-4">
+                    <a th:href="${isNew ? '/mo-hinh' : '/mo-hinh/' + moHinh.id}" class="btn btn-secondary">
+                        <i class="fas fa-times me-2"></i>Hủy
+                    </a>
+
+                    <button type="submit" class="btn btn-primary" th:if="${isNew}">
+                        <i class="fas fa-save me-2"></i>Tạo mô hình
+                    </button>
+
+                    <button type="submit" class="btn btn-success" th:unless="${isNew}" onclick="return confirm('Bạn có chắc chắn muốn bắt đầu huấn luyện mô hình này?');">
+                        <i class="fas fa-play me-2"></i>Bắt đầu huấn luyện
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const usePretrainedModel = document.getElementById('usePretrainedModel');
+        const pretrainedModelSection = document.getElementById('pretrainedModelSection');
+
+        usePretrainedModel.addEventListener('change', function() {
+            pretrainedModelSection.style.display = this.checked ? 'block' : 'none';
+        });
+    });
+
+    function validateForm() {
+        // Thêm các xác thực biểu mẫu nếu cần
+        return true;
+    }
+</script>
+</body>
+</html>

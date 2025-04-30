@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head}"></head>
+<body>
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+
+<div class="container mt-5">
+    <div class="card error-card text-center p-5 border-0 shadow">
+        <div class="card-body">
+            <i class="fas fa-exclamation-triangle text-danger fa-4x mb-4"></i>
+            <h1 class="text-danger mb-4">Lỗi!</h1>
+            <p class="lead mb-4">Đã xảy ra lỗi trong quá trình xử lý yêu cầu của bạn.</p>
+            <a href="/" class="btn btn-primary btn-lg">
+                <i class="fas fa-home me-2"></i>Quay lại trang chủ
+            </a>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+</body>
+</html>

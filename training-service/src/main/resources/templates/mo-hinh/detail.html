@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: head}"></head>
+<body>
+<nav th:replace="~{fragments/header :: navbar}"></nav>
+
+<div class="container mt-4">
+    <div class="page-header d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-brain text-primary me-2"></i>Chi tiết Mô Hình</h2>
+        <div>
+            <a th:href="@{/mo-hinh}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Quay lại
+            </a>
+            <a th:if="${moHinh.trangThai == 0}"
+               th:href="@{/mo-hinh/huan-luyen/{id}(id=${moHinh.id})}"
+               class="btn btn-success">
+                <i class="fas fa-play me-2"></i>Huấn luyện
+            </a>
+        </div>
+    </div>
+
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i><span th:text="${successMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i><span th:text="${errorMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0" th:text="${moHinh.ten}"></h5>
+                    <div>
+                        <span th:if="${moHinh.trangThai == 0}" class="badge bg-secondary">Chưa bắt đầu</span>
+                        <span th:if="${moHinh.trangThai == 1}" class="badge bg-secondary">Đang chờ</span>
+                        <span th:if="${moHinh.trangThai == 2}" class="badge bg-warning">Đang huấn luyện</span>
+                        <span th:if="${moHinh.trangThai == 3}" class="badge bg-success">Hoàn thành</span>
+                        <span th:if="${moHinh.trangThai == 4}" class="badge bg-danger">Lỗi</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p><strong><i class="fas fa-hashtag me-2"></i>ID:</strong> <span th:text="${moHinh.id}"></span></p>
+                            <p><strong><i class="fas fa-code-branch me-2"></i>Phiên bản:</strong> <span th:text="${moHinh.phienBan != null ? moHinh.phienBan : 'Chưa xác định'}"></span></p>
+                            <p>
+                                <strong><i class="fas fa-tags me-2"></i>Mục đích:</strong>
+                                <span th:if="${moHinh.mucDich == 'PHAT_HIEN_BAO_LUC'}" class="badge bg-danger">Phát hiện bạo lực</span>
+                                <span th:if="${moHinh.mucDich == 'NHAN_DANG_VUNG_CHUA'}" class="badge bg-primary">Nhận dạng vùng chứa</span>
+                                <span th:if="${moHinh.mucDich == 'NHAN_DANG_CHUYEN_DONG'}" class="badge bg-success">Nhận dạng chuyển động</span>
+                            </p>
+                            <p>
+                                <strong><i class="fas fa-cube me-2"></i>Loại mô hình:</strong>
+                                <span th:text="${moHinh.loaiMoHinh != null ? moHinh.loaiMoHinh.ten : 'Không xác định'}"></span>
+                            </p>
+                            <p>
+                                <strong><i class="fas fa-database me-2"></i>Tập dữ liệu:</strong>
+                                <span th:text="${moHinh.tapDuLieu != null ? moHinh.tapDuLieu.ten : 'Không xác định'}"></span>
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong><i class="fas fa-calendar-alt me-2"></i>Ngày tạo:</strong> <span th:text="${#temporals.format(moHinh.ngayTao, 'dd/MM/yyyy HH:mm')}"></span></p>
+                            <p><strong><i class="fas fa-edit me-2"></i>Ngày cập nhật:</strong> <span th:text="${#temporals.format(moHinh.ngayCapNhat, 'dd/MM/yyyy HH:mm')}"></span></p>
+                            <p><strong><i class="fas fa-play me-2"></i>Thời gian bắt đầu:</strong> <span th:text="${moHinh.thoiGianBatDau != null ? #temporals.format(moHinh.thoiGianBatDau, 'dd/MM/yyyy HH:mm') : 'Chưa bắt đầu'}"></span></p>
+                            <p><strong><i class="fas fa-stop me-2"></i>Thời gian kết thúc:</strong> <span th:text="${moHinh.thoiGianKetThuc != null ? #temporals.format(moHinh.thoiGianKetThuc, 'dd/MM/yyyy HH:mm') : 'Chưa kết thúc'}"></span></p>
+                            <p>
+                                <strong><i class="fas fa-chart-bar me-2"></i>Độ chính xác:</strong>
+                                <span th:if="${moHinh.doChinhXac != null}" th:text="${#numbers.formatDecimal(moHinh.doChinhXac * 100, 1, 2) + '%'}"></span>
+                                <span th:if="${moHinh.doChinhXac == null}">Chưa có</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <strong><i class="fas fa-file-alt me-2"></i>Mô tả:</strong>
+                        <div class="description-box p-3 bg-light rounded mt-2">
+                            <p th:text="${moHinh.moTa != null && !moHinh.moTa.isEmpty() ? moHinh.moTa : 'Không có mô tả'}"></p>
+                        </div>
+                    </div>
+
+                    <div th:if="${moHinh.thongSoHuanLuyen != null}">
+                        <strong><i class="fas fa-cogs me-2"></i>Thông số huấn luyện:</strong>
+                        <div class="thongso-box p-3 bg-light rounded mt-2">
+                            <pre th:text="${moHinh.thongSoHuanLuyen}"></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Trạng thái huấn luyện</h5>
+                </div>
+                <div class="card-body text-center" id="trainingStatus" th:data-status="${moHinh.trangThai}">
+                    <div th:if="${moHinh.trangThai == 1}" class="mb-3">
+                        <i class="fas fa-clock fa-4x text-secondary mb-3"></i>
+                        <h5>Đang chờ huấn luyện</h5>
+                        <p class="text-muted">Mô hình chưa được huấn luyện</p>
+                    </div>
+
+                    <div th:if="${moHinh.trangThai == 2}" class="mb-3">
+                        <div class="mb-3">
+                            <div class="spinner-border text-warning" role="status" style="width: 4rem; height: 4rem;">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                        <h5>Đang huấn luyện</h5>
+                        <p class="text-muted">Quá trình huấn luyện đang diễn ra</p>
+                        <p class="text-muted" th:if="${moHinh.thoiGianBatDau != null}">
+                            Bắt đầu: <span th:text="${#temporals.format(moHinh.thoiGianBatDau, 'dd/MM/yyyy HH:mm')}"></span>
+                        </p>
+                    </div>
+
+                    <div th:if="${moHinh.trangThai == 3}" class="mb-3">
+                        <i class="fas fa-check-circle fa-4x text-success mb-3"></i>
+                        <h5>Đã hoàn thành</h5>
+                        <p class="text-muted">Quá trình huấn luyện đã hoàn thành</p>
+                        <div class="accuracy-meter mt-3">
+                            <h6>Độ chính xác</h6>
+                            <div class="progress" style="height: 25px;">
+                                <div class="progress-bar bg-success" role="progressbar"
+                                     th:style="'width: ' + ${moHinh.doChinhXac * 100} + '%'"
+                                     th:text="${#numbers.formatDecimal(moHinh.doChinhXac * 100, 1, 2) + '%'}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div th:if="${moHinh.trangThai == 4}" class="mb-3">
+                        <i class="fas fa-exclamation-triangle fa-4x text-danger mb-3"></i>
+                        <h5>Huấn luyện thất bại</h5>
+                        <p class="text-muted">Đã xảy ra lỗi trong quá trình huấn luyện</p>
+                    </div>
+
+<!--                    <a th:if="${moHinh.trangThai != 'DANG_HUAN_LUYEN'}"-->
+<!--                       th:href="@{/mo-hinh/huan-luyen/{id}(id=${moHinh.id})}"-->
+<!--                       class="btn btn-success mt-3">-->
+<!--                        <i class="fas fa-play me-2"></i>Huấn luyện mô hình-->
+<!--                    </a>-->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+</body>
+</html>
