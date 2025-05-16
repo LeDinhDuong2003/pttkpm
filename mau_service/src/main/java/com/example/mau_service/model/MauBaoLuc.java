@@ -20,7 +20,6 @@ public class MauBaoLuc {
     private LocalDateTime ngayTao;
     private LocalDateTime ngayCapNhat;
 
-    // Không lưu trong DB, chỉ để xử lý upload file
-    @JsonIgnore
-    private transient MultipartFile videoFile;
+//    @JsonIgnore
+//    private transient MultipartFile videoFile;
 }

@@ -3,6 +3,7 @@ package com.example.database_service.service;
 
 import com.example.database_service.model.MauBaoLuc;
 import com.example.database_service.repository.MauBaoLucRepository;
+import com.example.database_service.repository.TapDuLieuMauRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +17,8 @@ public class MauBaoLucService {
 
     @Autowired
     private MauBaoLucRepository mauBaoLucRepository;
+    @Autowired
+    private TapDuLieuMauRepository tapDuLieuMauRepository;
 
     public Page<MauBaoLuc> layTatCaMauBaoLuc(Pageable pageable) {
         return mauBaoLucRepository.findAll(pageable);
@@ -38,6 +41,8 @@ public class MauBaoLucService {
     }
 
     public void xoaMauBaoLuc(Long id) {
+        System.out.println("Xóa mẫu bạo lực với ID: " + id);
+//        tapDuLieuMauRepository.deleteByMauBaoLucId(id);
         mauBaoLucRepository.deleteById(id);
     }
 }

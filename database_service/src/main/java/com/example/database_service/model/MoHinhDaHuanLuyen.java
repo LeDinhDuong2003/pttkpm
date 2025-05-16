@@ -32,7 +32,7 @@ public class MoHinhDaHuanLuyen {
 
     private String duongDanMoHinh;
 
-    @Column(columnDefinition = "JSON")
+    @Column(columnDefinition = "TEXT")
     private String thongSoHuanLuyen;
 
     @ManyToOne
@@ -43,15 +43,19 @@ public class MoHinhDaHuanLuyen {
 
     private Float doChinhXac;
 
+    @Column(columnDefinition = "DATETIME")
     private LocalDateTime thoiGianBatDau;
 
+    @Column(columnDefinition = "DATETIME")
     private LocalDateTime thoiGianKetThuc;
 
     // Bỏ @Enumerated vì bạn dùng Integer
     private Integer trangThai;
 
+    @Column(columnDefinition = "DATETIME")
     private LocalDateTime ngayTao;
 
+    @Column(columnDefinition = "DATETIME")
     private LocalDateTime ngayCapNhat;
 
     @PrePersist

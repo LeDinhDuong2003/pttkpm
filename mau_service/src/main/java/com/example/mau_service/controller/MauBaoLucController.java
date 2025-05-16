@@ -10,6 +10,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -18,6 +21,7 @@ import java.util.Map;
 @RequestMapping("/mau-bao-luc")
 public class MauBaoLucController {
 
+    private static final Logger logger = LoggerFactory.getLogger(MauBaoLucController.class);
     private final MauBaoLucService mauBaoLucService;
 
     @Value("${api.database-service.url}")
@@ -36,7 +40,7 @@ public class MauBaoLucController {
         try{
             Map<String, Object> result = mauBaoLucService.layDanhSachMauBaoLuc(nhan, trang, soLuong);
             List<MauBaoLuc> mauBaoLucs = (List<MauBaoLuc>) result.get("mauBaoLucs");
-            System.out.println(result.get("mauBaoLucs"));
+            logger.debug("Lấy được {} mẫu bạo lực", mauBaoLucs != null ? mauBaoLucs.size() : 0);
 
             model.addAttribute("mauBaoLucs", result.get("mauBaoLucs"));
             model.addAttribute("trangHienTai", result.get("trangHienTai"));
@@ -44,59 +48,100 @@ public class MauBaoLucController {
             model.addAttribute("tongSoTrang", result.get("tongSoTrang"));
             model.addAttribute("nhan", nhan);
 
-            System.out.println("list-mau-bao-luc-page");
+            logger.info("Hiển thị trang danh sách mẫu bạo lực");
             return "mau-bao-luc/list";
-        }catch (Exception e){
-            System.out.println(e.toString());
+        } catch (Exception e) {
+            logger.error("Lỗi khi hiển thị danh sách mẫu bạo lực: {}", e.getMessage());
             return "redirect:/error";
         }
-
     }
 
     @GetMapping("/{id}")
     public String chiTiet(@PathVariable Long id, Model model) {
-        MauBaoLuc mauBaoLuc = mauBaoLucService.layMauBaoLucTheoId(id);
-        model.addAttribute("mauBaoLuc", mauBaoLuc);
-
-        return "mau-bao-luc/detail";
+        try {
+            MauBaoLuc mauBaoLuc = mauBaoLucService.layMauBaoLucTheoId(id);
+            model.addAttribute("mauBaoLuc", mauBaoLuc);
+            logger.info("Hiển thị chi tiết mẫu bạo lực ID: {}", id);
+            return "mau-bao-luc/detail";
+        } catch (Exception e) {
+            logger.error("Lỗi khi hiển thị chi tiết mẫu bạo lực: {}", e.getMessage());
+            return "redirect:/error";
+        }
     }
 
-    // Tiếp tục MauBaoLucController.java
     @GetMapping("/them-moi")
     public String formThemMoi(Model model) {
         model.addAttribute("mauBaoLuc", new MauBaoLuc());
-        System.out.println("them-moi-mau-bao-luc-page");
+        logger.info("Hiển thị form thêm mới mẫu bạo lực");
         return "mau-bao-luc/add";
     }
 
     @PostMapping("/them-moi")
-    public String themMoi(@ModelAttribute MauBaoLuc mauBaoLuc) {
+    public String themMoi(@ModelAttribute MauBaoLuc mauBaoLuc,
+                          @RequestParam("videoFile") MultipartFile videoFile) {
         try {
-            System.out.println("Lay du lieu");
-            mauBaoLucService.taoMauBaoLuc(mauBaoLuc);
-            System.out.println("lay du lieu xong");
+            logger.info("Bắt đầu xử lý thêm mới mẫu bạo lực");
+
+            // Gán file video vào model để dịch vụ có thể xử lý
+//            mauBaoLuc.setVideoFile(videoFile);
+
+            // Kiểm tra file có được upload không
+            if (videoFile != null && !videoFile.isEmpty()) {
+                logger.info("File video được upload: {} ({} bytes)",
+                        videoFile.getOriginalFilename(), videoFile.getSize());
+            } else {
+                logger.warn("Không có file video được upload");
+            }
+
+            // Lưu mẫu bạo lực (service sẽ xử lý việc tải file lên)
+            MauBaoLuc savedMau = mauBaoLucService.taoMauBaoLuc(mauBaoLuc,videoFile);
+            logger.info("Đã tạo mẫu bạo lực ID: {}", savedMau.getId());
+
             return "redirect:/mau-bao-luc";
         } catch (Exception e) {
-            System.out.println(e.toString());
-            System.out.println("Error creating MauBaoLuc: " + e.getMessage());
+            logger.error("Lỗi khi tạo mẫu bạo lực: {}", e.getMessage(), e);
             return "redirect:/error";
         }
     }
 
     @GetMapping("/chinh-sua/{id}")
     public String formChinhSua(@PathVariable Long id, Model model) {
-        MauBaoLuc mauBaoLuc = mauBaoLucService.layMauBaoLucTheoId(id);
-        model.addAttribute("mauBaoLuc", mauBaoLuc);
-
-        return "mau-bao-luc/edit";
+        try {
+            MauBaoLuc mauBaoLuc = mauBaoLucService.layMauBaoLucTheoId(id);
+            model.addAttribute("mauBaoLuc", mauBaoLuc);
+            logger.info("Hiển thị form chỉnh sửa mẫu bạo lực ID: {}", id);
+            return "mau-bao-luc/edit";
+        } catch (Exception e) {
+            logger.error("Lỗi khi hiển thị form chỉnh sửa: {}", e.getMessage());
+            return "redirect:/error";
+        }
     }
 
     @PostMapping("/chinh-sua/{id}")
-    public String chinhSua(@PathVariable Long id, @ModelAttribute MauBaoLuc mauBaoLuc) {
+    public String chinhSua(@PathVariable Long id,
+                           @ModelAttribute MauBaoLuc mauBaoLuc,
+                           @RequestParam(value = "videoFile", required = false) MultipartFile videoFile) {
         try {
-            mauBaoLucService.capNhatMauBaoLuc(id, mauBaoLuc);
+            logger.info("Bắt đầu xử lý chỉnh sửa mẫu bạo lực ID: {}", id);
+
+            // Gán file video vào model để dịch vụ có thể xử lý
+//            mauBaoLuc.setVideoFile(videoFile);
+
+            // Kiểm tra file có được upload không
+            if (videoFile != null && !videoFile.isEmpty()) {
+                logger.info("File video mới được upload: {} ({} bytes)",
+                        videoFile.getOriginalFilename(), videoFile.getSize());
+            } else {
+                logger.info("Không thay đổi file video");
+            }
+
+            // Cập nhật mẫu bạo lực
+            mauBaoLucService.capNhatMauBaoLuc(id, mauBaoLuc,videoFile);
+            logger.info("Đã cập nhật mẫu bạo lực ID: {}", id);
+
             return "redirect:/mau-bao-luc/" + id;
         } catch (Exception e) {
+            logger.error("Lỗi khi cập nhật mẫu bạo lực: {}", e.getMessage(), e);
             return "redirect:/error";
         }
     }
@@ -104,19 +149,26 @@ public class MauBaoLucController {
     @GetMapping("/xoa/{id}")
     public String xoa(@PathVariable Long id) {
         try {
+            logger.info("Xóa mẫu bạo lực ID: {}", id);
             mauBaoLucService.xoaMauBaoLuc(id);
             return "redirect:/mau-bao-luc";
         } catch (Exception e) {
+            logger.error("Lỗi khi xóa mẫu bạo lực: {}", e.getMessage());
             return "redirect:/error";
         }
     }
 
     @GetMapping("/nhan/{nhan}")
     public String locTheoNhan(@PathVariable String nhan, Model model) {
-        List<MauBaoLuc> mauBaoLucs = mauBaoLucService.layMauBaoLucTheoNhan(nhan);
-        model.addAttribute("mauBaoLucs", mauBaoLucs);
-        model.addAttribute("nhan", nhan);
-
-        return "mau-bao-luc/list-by-nhan";
+        try {
+            List<MauBaoLuc> mauBaoLucs = mauBaoLucService.layMauBaoLucTheoNhan(nhan);
+            model.addAttribute("mauBaoLucs", mauBaoLucs);
+            model.addAttribute("nhan", nhan);
+            logger.info("Lọc mẫu bạo lực theo nhãn: {}", nhan);
+            return "mau-bao-luc/list-by-nhan";
+        } catch (Exception e) {
+            logger.error("Lỗi khi lọc theo nhãn: {}", e.getMessage());
+            return "redirect:/error";
+        }
     }
 }

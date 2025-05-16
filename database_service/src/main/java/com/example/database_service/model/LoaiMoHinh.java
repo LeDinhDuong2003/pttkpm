@@ -26,7 +26,7 @@ public class LoaiMoHinh {
     @Column(columnDefinition = "TEXT")
     private String moTa;
 
-    @Column(columnDefinition = "JSON")
+    @Column(columnDefinition = "TEXT")
     private String thongSoMacDinh;
 
     @OneToMany(mappedBy = "loaiMoHinh", cascade = CascadeType.ALL)

@@ -27,6 +27,7 @@ public class MoHinhController {
         this.huanLuyenService = huanLuyenService;
     }
 
+    // ===== GET: Danh sách mô hình =====
     @GetMapping
     public String danhSach(
             @RequestParam(required = false) String mucDich,
@@ -47,28 +48,58 @@ public class MoHinhController {
         return "mo-hinh/list";
     }
 
+    // ===== GET: Chi tiết mô hình =====
     @GetMapping("/{id}")
     public String chiTiet(@PathVariable Long id, Model model) {
         MoHinhDaHuanLuyen moHinh = moHinhService.layMoHinhTheoId(id);
         model.addAttribute("moHinh", moHinh);
-
         return "mo-hinh/detail";
     }
 
-    @GetMapping("/huan-luyen/{id}")
-    public String formHuanLuyen(@PathVariable Long id, Model model) {
-        MoHinhDaHuanLuyen moHinh = moHinhService.layMoHinhTheoId(id);
+    // ===== GET: Form thêm mới mô hình =====
+    @GetMapping("/them-moi")
+    public String formThemMoi(Model model) {
+        List<LoaiMoHinh> loaiMoHinhs = moHinhService.layDanhSachLoaiMoHinh();
+        List<TapDuLieu> tapDuLieus = moHinhService.layDanhSachTapDuLieu();
 
-        // Nếu mô hình chưa có thông số huấn luyện, khởi tạo form thông số mặc định
-//        if (moHinh.getThongSoForm() == null) {
-//            moHinh.setThongSoForm(new MoHinhDaHuanLuyen.ThongSoForm());
-//        }
-
-        model.addAttribute("moHinh", moHinh);
+        model.addAttribute("moHinh", new MoHinhDaHuanLuyen());
+        model.addAttribute("loaiMoHinhs", loaiMoHinhs);
+        model.addAttribute("tapDuLieus", tapDuLieus);
+        model.addAttribute("isNew", true);
 
         return "mo-hinh/train";
     }
 
+    // ===== POST: Xử lý thêm mới mô hình =====
+    @PostMapping("/them-moi")
+    public String themMoi(
+            @ModelAttribute MoHinhDaHuanLuyen moHinh,
+            @RequestParam(defaultValue = "1") Long nguoiDungId,
+            RedirectAttributes redirectAttributes) {
+
+        try {
+            MoHinhDaHuanLuyen moHinhMoi = moHinhService.taoMoHinh(moHinh);
+            redirectAttributes.addFlashAttribute("successMessage", "Đã tạo mô hình thành công!");
+            return "redirect:/mo-hinh/" + moHinhMoi.getId();
+        } catch (Exception e) {
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("errorMessage", "Lỗi xử lý: " + e.getMessage());
+            return "redirect:/mo-hinh/them-moi";
+        }
+    }
+
+    // ===== GET: Form huấn luyện mô hình =====
+    @GetMapping("/huan-luyen/{id}")
+    public String formHuanLuyen(@PathVariable Long id, Model model) {
+        MoHinhDaHuanLuyen moHinh = moHinhService.layMoHinhTheoId(id);
+
+        model.addAttribute("moHinh", moHinh);
+        model.addAttribute("isNew", false);
+
+        return "mo-hinh/train";
+    }
+
+    // ===== POST: Xử lý huấn luyện mô hình =====
     @PostMapping("/huan-luyen/{id}")
     public String huanLuyen(
             @PathVariable Long id,
@@ -76,15 +107,12 @@ public class MoHinhController {
             RedirectAttributes redirectAttributes) {
 
         try {
-            // Cập nhật thông số huấn luyện cho mô hình
-            moHinhService.capNhatMoHinh(id, moHinh);
-
-            // Bắt đầu quá trình huấn luyện
+            System.out.println("Starting training for model ID: " + id);
             boolean ketQua = huanLuyenService.batDauHuanLuyen(id);
+            System.out.println("Training result: " + ketQua);
 
             if (ketQua) {
                 redirectAttributes.addFlashAttribute("successMessage", "Đã bắt đầu huấn luyện mô hình thành công!");
-                // Tiếp tục MoHinhController.java
             } else {
                 redirectAttributes.addFlashAttribute("errorMessage", "Có lỗi xảy ra khi bắt đầu huấn luyện mô hình.");
             }
@@ -97,45 +125,14 @@ public class MoHinhController {
         }
     }
 
-    @GetMapping("/them-moi")
-    public String formThemMoi(Model model) {
-        // Lấy danh sách loại mô hình
-        List<LoaiMoHinh> loaiMoHinhs = moHinhService.layDanhSachLoaiMoHinh();
-
-        // Lấy danh sách tập dữ liệu huấn luyện
-        List<TapDuLieu> tapDuLieus = moHinhService.layDanhSachTapDuLieu();
-
-        MoHinhDaHuanLuyen moHinh = new MoHinhDaHuanLuyen();
-        // Khởi tạo form thông số mặc định
-//        moHinh.setThongSoForm(new MoHinhDaHuanLuyen.ThongSoForm());
-
-        model.addAttribute("moHinh", moHinh);
-        model.addAttribute("loaiMoHinhs", loaiMoHinhs);
-        model.addAttribute("tapDuLieus", tapDuLieus);
-        model.addAttribute("isNew", true);
-
-        return "mo-hinh/train";
-    }
-
-    @PostMapping("/them-moi")
-    public String themMoi(
-            @ModelAttribute MoHinhDaHuanLuyen moHinh,
-            @RequestParam(defaultValue = "1") Long nguoiDungId,
-            RedirectAttributes redirectAttributes) {
-
+    // ===== GET: Xoá mô hình =====
+    @GetMapping("/xoa/{id}")
+    public String xoa(@PathVariable Long id) {
         try {
-            // Thiết lập người dùng ID
-//            moHinh.setNguoiDungId(nguoiDungId);
-
-            // Tạo mô hình mới
-            MoHinhDaHuanLuyen moHinhMoi = moHinhService.taoMoHinh(moHinh);
-
-            redirectAttributes.addFlashAttribute("successMessage", "Đã tạo mô hình thành công!");
-            return "redirect:/mo-hinh/" + moHinhMoi.getId();
+            moHinhService.xoaMoHinh(id);
+            return "redirect:/mo-hinh";
         } catch (Exception e) {
-            e.printStackTrace();
-            redirectAttributes.addFlashAttribute("errorMessage", "Lỗi xử lý: " + e.getMessage());
-            return "redirect:/mo-hinh/them-moi";
+            return "redirect:/error";
         }
     }
 }

@@ -47,13 +47,6 @@ public class TapDuLieuService {
         List<MauBaoLuc> danhSachMau = layDanhSachMauBaoLucTrongTapDuLieu(id);
         tapDuLieu.setDanhSachMau(danhSachMau);
 
-        // Tạo danh sách ID của các mẫu đã chọn
-        List<Long> selectedMauIds = new ArrayList<>();
-        for (MauBaoLuc mau : danhSachMau) {
-            selectedMauIds.add(mau.getId());
-        }
-//        tapDuLieu.setSelectedMauIds(selectedMauIds);
-
         return tapDuLieu;
     }
 
@@ -66,42 +59,39 @@ public class TapDuLieuService {
         return response.getBody() != null ? response.getBody() : new ArrayList<>();
     }
 
-    public TapDuLieu taoTapDuLieu(TapDuLieu tapDuLieu) {
+    public TapDuLieu taoTapDuLieu(TapDuLieu tapDuLieu, List<Long> mauIds) {
         // Tạo tập dữ liệu đầu tiên
         Map<String, Object> queryParams = new HashMap<>();
-
         TapDuLieu tapDuLieuSaved = apiClient.post("/tap-du-lieu", tapDuLieu, TapDuLieu.class, queryParams);
 
-        // Thêm các mẫu đã chọn vào tập dữ liệu
-        if (tapDuLieu.getDanhSachMau() != null && !tapDuLieu.getDanhSachMau().isEmpty()) {
-            for (MauBaoLuc mau : tapDuLieu.getDanhSachMau()) {
-                themMauVaoTapDuLieu(tapDuLieuSaved.getId(), mau.getId());
+        if (mauIds != null && !mauIds.isEmpty()) {
+            for (Long mauId : mauIds) {
+                themMauVaoTapDuLieu(tapDuLieuSaved.getId(), mauId);
             }
         }
 
         return tapDuLieuSaved;
     }
 
-    public void capNhatTapDuLieu(Long id, TapDuLieu tapDuLieu) {
+    public void capNhatTapDuLieu(Long id, TapDuLieu tapDuLieu, List<Long> mauIds) {
         // Cập nhật thông tin tập dữ liệu
         apiClient.put("/tap-du-lieu/" + id, tapDuLieu);
 
         // Lấy danh sách mẫu hiện tại trong tập dữ liệu
         List<MauBaoLuc> danhSachMauHienTai = layDanhSachMauBaoLucTrongTapDuLieu(id);
 
-        List<Long> list_id = new ArrayList<>();
-        for(MauBaoLuc mauSau : tapDuLieu.getDanhSachMau()){
-            list_id.add(mauSau.getId());
-        }
+        // Nếu không có mauIds thì mặc định là không chọn mẫu nào
+        List<Long> selectedMauIds = mauIds != null ? mauIds : new ArrayList<>();
+
         // Xóa các mẫu không còn được chọn
         for (MauBaoLuc mau : danhSachMauHienTai) {
-            if (!list_id.contains(mau.getId())) {
+            if (!selectedMauIds.contains(mau.getId())) {
                 xoaMauKhoiTapDuLieu(id, mau.getId());
             }
         }
 
         // Thêm các mẫu mới được chọn
-        for (Long mauId : list_id) {
+        for (Long mauId : selectedMauIds) {
             boolean daTonTai = false;
             for (MauBaoLuc mau : danhSachMauHienTai) {
                 if (mau.getId().equals(mauId)) {

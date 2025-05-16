@@ -16,6 +16,11 @@
                class="btn btn-success">
                 <i class="fas fa-play me-2"></i>Huấn luyện
             </a>
+            <a th:if="${moHinh.trangThai == 4}"
+               th:href="@{/mo-hinh/huan-luyen/{id}(id=${moHinh.id})}"
+               class="btn btn-success">
+                <i class="fas fa-play me-2"></i>Huấn luyện lại
+            </a>
         </div>
     </div>
 
@@ -73,6 +78,10 @@
                             </p>
                         </div>
                     </div>
+                    <p>
+                        <strong><i class="fas fa-link me-2"></i>Link mô hình:</strong>
+                        <span th:text="${moHinh.duongDanMoHinh != null ? moHinh.duongDanMoHinh : 'Không xác định'}"></span>
+                    </p>
 
                     <div class="mb-3">
                         <strong><i class="fas fa-file-alt me-2"></i>Mô tả:</strong>

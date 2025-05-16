@@ -21,7 +21,7 @@
     <div class="card">
         <div class="card-header">
             <h5 class="mb-0" th:if="${isNew}"><i class="fas fa-cog me-2"></i>Thông tin mô hình</h5>
-            <h5 class="mb-0" th:unless="${isNew}"><i class="fas fa-sliders-h me-2"></i>Thông số huấn luyện</h5>
+            <h5 class="mb-0" th:unless="${isNew}"><i class="fas fa-sliders-h me-2"></i>Xác nhận huấn luyện mô hình</h5>
         </div>
         <div class="card-body">
             <form th:action="${isNew ? '/mo-hinh/them-moi' : '/mo-hinh/huan-luyen/' + moHinh.id}" method="post" th:object="${moHinh}" onsubmit="return validateForm()">
@@ -49,8 +49,8 @@
                             <select class="form-select" id="mucDich" th:field="*{mucDich}" required>
                                 <option value="">-- Chọn mục đích --</option>
                                 <option value="PHAT_HIEN_BAO_LUC">Phát hiện bạo lực</option>
-                                <option value="NHAN_DANG_VUNG_CHUA">Nhận dạng vùng chứa</option>
-                                <option value="NHAN_DANG_CHUYEN_DONG">Nhận dạng chuyển động</option>
+<!--                                <option value="NHAN_DANG_VUNG_CHUA">Nhận dạng vùng chứa</option>-->
+<!--                                <option value="NHAN_DANG_CHUYEN_DONG">Nhận dạng chuyển động</option>-->
                             </select>
                         </div>
                     </div>
@@ -78,71 +78,13 @@
                     </div>
                 </div>
 
-                <h5 class="border-bottom pb-2 mb-3"><i class="fas fa-cogs me-2"></i>Thông số huấn luyện</h5>
-
                 <div class="row mb-3">
                     <div class="col-md-6">
-<!--                        <div class="mb-3">-->
-<!--                            <label for="epochs" class="form-label">Số epochs</label>-->
-<!--                            <input type="number" class="form-control" id="epochs" th:field="*{thongSoForm.epochs}" min="1" max="1000">-->
-<!--                        </div>-->
-
-<!--                        <div class="mb-3">-->
-<!--                            <label for="batchSize" class="form-label">Batch size</label>-->
-<!--                            <input type="number" class="form-control" id="batchSize" th:field="*{thongSoForm.batchSize}" min="1" max="512">-->
-<!--                        </div>-->
-
-<!--                        <div class="mb-3">-->
-<!--                            <label for="optimizer" class="form-label">Optimizer</label>-->
-<!--                            <select class="form-select" id="optimizer" th:field="*{thongSoForm.optimizer}">-->
-<!--                                <option value="adam">Adam</option>-->
-<!--                                <option value="sgd">SGD</option>-->
-<!--                                <option value="rmsprop">RMSprop</option>-->
-<!--                                <option value="adagrad">Adagrad</option>-->
-<!--                            </select>-->
-<!--                        </div>-->
                     </div>
-
-<!--                    <div class="col-md-6">-->
-<!--                        <div class="mb-3">-->
-<!--                            <label for="learningRate" class="form-label">Learning rate</label>-->
-<!--                            <input type="number" class="form-control" id="learningRate" th:field="*{thongSoForm.learningRate}" step="0.0001" min="0.0001" max="1">-->
-<!--                        </div>-->
-
-<!--                        <div class="mb-3">-->
-<!--                            <label for="valSplit" class="form-label">Tỷ lệ validation split</label>-->
-<!--                            <input type="number" class="form-control" id="valSplit" th:field="*{thongSoForm.valSplit}" step="0.01" min="0.1" max="0.5">-->
-<!--                        </div>-->
-
-<!--                        <div class="mb-3">-->
-<!--                            <label for="lossFunction" class="form-label">Hàm loss</label>-->
-<!--                            <select class="form-select" id="lossFunction" th:field="*{thongSoForm.lossFunction}">-->
-<!--                                <option value="categorical_crossentropy">Categorical Crossentropy</option>-->
-<!--                                <option value="binary_crossentropy">Binary Crossentropy</option>-->
-<!--                                <option value="mse">Mean Squared Error</option>-->
-<!--                                <option value="mae">Mean Absolute Error</option>-->
-<!--                            </select>-->
-<!--                        </div>-->
-<!--                    </div>-->
                 </div>
 
                 <div class="form-check mb-3">
-<!--                    <input class="form-check-input" type="checkbox" id="usePretrainedModel" th:field="*{thongSoForm.usePretrainedModel}">-->
-<!--                    <label class="form-check-label" for="usePretrainedModel">-->
-<!--                        Sử dụng mô hình đã huấn luyện trước (Transfer learning)-->
-<!--                    </label>-->
                 </div>
-
-<!--                <div class="mb-4" id="pretrainedModelSection" th:style="${moHinh.thongSoForm.usePretrainedModel ? '' : 'display: none;'}">-->
-<!--                    <label for="pretrainedModelName" class="form-label">Tên mô hình pre-trained</label>-->
-<!--                    <select class="form-select" id="pretrainedModelName" th:field="*{thongSoForm.pretrainedModelName}">-->
-<!--                        <option value="VGG16">VGG16</option>-->
-<!--                        <option value="VGG19">VGG19</option>-->
-<!--                        <option value="ResNet50">ResNet50</option>-->
-<!--                        <option value="MobileNetV2">MobileNetV2</option>-->
-<!--                        <option value="EfficientNetB0">EfficientNetB0</option>-->
-<!--                    </select>-->
-<!--                </div>-->
 
                 <div class="d-flex justify-content-between mt-4">
                     <a th:href="${isNew ? '/mo-hinh' : '/mo-hinh/' + moHinh.id}" class="btn btn-secondary">

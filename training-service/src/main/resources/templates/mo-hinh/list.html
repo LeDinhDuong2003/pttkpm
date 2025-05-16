@@ -40,10 +40,10 @@
                     <label for="trangThai" class="form-label">Trạng thái</label>
                     <select class="form-select" id="trangThai" name="trangThai">
                         <option value="">Tất cả</option>
-                        <option value=1 th:selected="${trangThai == 'DANG_CHO'}">Đang chờ</option>
-                        <option value=2 th:selected="${trangThai == 'DANG_HUAN_LUYEN'}">Đang huấn luyện</option>
-                        <option value=3 th:selected="${trangThai == 'HOAN_THANH'}">Hoàn thành</option>
-                        <option value=4 th:selected="${trangThai == 'LOI'}">Lỗi</option>
+                        <option value=1 th:selected="${trangThai == 1}">Đang chờ</option>
+                        <option value=2 th:selected="${trangThai == 2}">Đang huấn luyện</option>
+                        <option value=3 th:selected="${trangThai == 3}">Hoàn thành</option>
+                        <option value=4 th:selected="${trangThai == 4}">Lỗi</option>
                     </select>
                 </div>
                 <div class="col-md-2 d-flex align-items-end">
@@ -85,17 +85,17 @@
                             <span th:if="${moHinh.doChinhXac == null}">-</span>
                         </td>
                         <td>
-                            <span th:if="${moHinh.trangThai == 'DANG_CHO'}" class="badge bg-secondary">Đang chờ</span>
-                            <span th:if="${moHinh.trangThai == 'DANG_HUAN_LUYEN'}" class="badge bg-warning">Đang huấn luyện</span>
-                            <span th:if="${moHinh.trangThai == 'HOAN_THANH'}" class="badge bg-success">Hoàn thành</span>
-                            <span th:if="${moHinh.trangThai == 'LOI'}" class="badge bg-danger">Lỗi</span>
+                            <span th:if="${moHinh.trangThai == 1}" class="badge bg-secondary">Đang chờ</span>
+                            <span th:if="${moHinh.trangThai == 2}" class="badge bg-warning">Đang huấn luyện</span>
+                            <span th:if="${moHinh.trangThai == 3}" class="badge bg-success">Hoàn thành</span>
+                            <span th:if="${moHinh.trangThai == 4}" class="badge bg-danger">Lỗi</span>
                         </td>
                         <td class="text-center">
                             <div class="btn-group">
                                 <a th:href="@{/mo-hinh/{id}(id=${moHinh.id})}" class="btn btn-sm btn-info" title="Xem chi tiết">
                                     <i class="fas fa-eye"></i>
                                 </a>
-                                <a class="btn btn-sm btn-danger" title="Xóa"
+                                <a th:href="@{/mo-hinh/xoa/{id}(id=${moHinh.id})}" class="btn btn-sm btn-danger" title="Xóa"
                                    onclick="return confirm('Bạn có chắc chắn muốn xóa mẫu này?')">
                                     <i class="fas fa-trash"></i>
                                 </a>

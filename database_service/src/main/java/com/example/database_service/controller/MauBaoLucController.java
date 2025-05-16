@@ -118,6 +118,7 @@ public class MauBaoLucController {
     @DeleteMapping("/{id}")
     public ResponseEntity<HttpStatus> xoaMauBaoLuc(@PathVariable("id") Long id) {
         try {
+            System.out.println("endpoint xoa");
             mauBaoLucService.xoaMauBaoLuc(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (Exception e) {

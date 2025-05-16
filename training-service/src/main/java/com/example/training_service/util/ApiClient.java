@@ -1,3 +1,4 @@
+// training-service/src/main/java/com/example/training_service/util/ApiClient.java
 package com.example.training_service.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -113,17 +114,13 @@ public class ApiClient {
         restTemplate.exchange(url, HttpMethod.PUT, requestEntity, Void.class);
     }
 
-    // Gọi API training processor
-    public ResponseEntity<String> requestTraining(Long moHinhId) {
-        String url = apiTrainingProcessorUrl;
+    public ResponseEntity<Map<String, Object>> requestTraining(Long moHinhId) {
+        String url = apiTrainingProcessorUrl + "/train/" + moHinhId;
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        Map<String, Object> request = new HashMap<>();
-        request.put("moHinhId", moHinhId);
-
-        HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(request, headers);
-        return restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
+        HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
+        return restTemplate.exchange(url, HttpMethod.GET, requestEntity, new ParameterizedTypeReference<Map<String, Object>>() {});
     }
 
     // Parse phản hồi phân trang từ API
@@ -155,5 +152,9 @@ public class ApiClient {
             e.printStackTrace();
             return new HashMap<>();
         }
+    }
+    public void delete(String endpoint) {
+        String url = apiDatabaseUrl + endpoint;
+        restTemplate.delete(url);
     }
 }

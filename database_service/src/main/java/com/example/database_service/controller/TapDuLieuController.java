@@ -61,6 +61,7 @@ public class TapDuLieuController {
             response.put("tongSoMuc", pageTapDuLieu.getTotalElements());
             response.put("tongSoTrang", pageTapDuLieu.getTotalPages());
 
+//            System.out.println(new ResponseEntity<>(response, HttpStatus.OK).toString());
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);

@@ -46,14 +46,15 @@ public class MoHinhDaHuanLuyenService {
         return moHinhDaHuanLuyenRepository.findByTrangThai(trangThai);
     }
 
+    public Page<MoHinhDaHuanLuyen> layMoHinhDaHuanLuyenTheoTrangThaiVaMucDich(String mucDich,Integer trangThai, Pageable pageable) {
+        return moHinhDaHuanLuyenRepository.findByMucDichAndTrangThai(mucDich,trangThai, pageable);
+    }
+
     public Page<MoHinhDaHuanLuyen> layMoHinhDaHuanLuyenTheoTrangThai(Integer trangThai, Pageable pageable) {
         return moHinhDaHuanLuyenRepository.findByTrangThai(trangThai, pageable);
     }
 
     public MoHinhDaHuanLuyen luuMoHinhDaHuanLuyen(MoHinhDaHuanLuyen moHinhDaHuanLuyen) {
-//        if (moHinhDaHuanLuyen.getTrangThai() == MoHinhDaHuanLuyen.TrangThai.DANG_HUAN_LUYEN && moHinhDaHuanLuyen.getId() == null) {
-            moHinhDaHuanLuyen.setThoiGianBatDau(LocalDateTime.now());
-//        }
         return moHinhDaHuanLuyenRepository.save(moHinhDaHuanLuyen);
     }
 

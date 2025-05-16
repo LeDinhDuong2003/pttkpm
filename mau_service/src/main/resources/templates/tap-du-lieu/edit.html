@@ -57,6 +57,10 @@
                             <input class="form-check-input" type="checkbox" id="selectAll">
                             <label class="form-check-label" for="selectAll">Chọn tất cả</label>
                         </div>
+
+                    </div>
+                    <div class="mt-2 mt-md-0 w-100 w-md-auto">
+                        <input type="text" id="filterInput" class="form-control" placeholder="Lọc theo tên hoặc nhãn...">
                     </div>
                     <div class="card-body p-0">
                         <div class="table-responsive">
@@ -74,7 +78,9 @@
                                     <td class="text-center">
                                         <div class="form-check">
                                             <input class="form-check-input mau-checkbox" type="checkbox"
-                                                   name="mauIds" th:value="${mau.id}">
+                                                   name="mauIds" th:value="${mau.id}"
+                                                   th:checked="${#lists.contains(tapDuLieu.danhSachMau, mau)}"
+                                                   th:id="${'mau_' + mau.id}">
                                         </div>
                                     </td>
                                     <td th:text="${mau.id}"></td>
@@ -98,7 +104,6 @@
                             <div class="text-muted small">
                                 <i class="fas fa-info-circle me-1"></i> Chọn các mẫu bạo lực để thêm vào tập dữ liệu
                             </div>
-<!--                            <div class="badge bg-primary" th:text="${'Đã chọn: ' + #lists.size(tapDuLieu.selectedMauIds) + ' mẫu'}"></div>-->
                         </div>
                     </div>
                 </div>
@@ -151,14 +156,15 @@
         });
 
         // Thêm tính năng lọc theo nhãn
-        const filterInput = document.createElement('input');
-        filterInput.type = 'text';
-        filterInput.className = 'form-control mt-2';
-        filterInput.placeholder = 'Lọc theo tên hoặc nhãn...';
+        // const filterInput = document.createElement('input');
+        // filterInput.type = 'text';
+        // filterInput.className = 'form-control mt-2';
+        // filterInput.placeholder = 'Lọc theo tên hoặc nhãn...';
+        //
+        // const tableHeader = document.querySelector('.card-header');
+        // tableHeader.parentNode.insertBefore(filterInput, tableHeader.nextSibling);
 
-        const tableHeader = document.querySelector('.card-header');
-        tableHeader.parentNode.insertBefore(filterInput, tableHeader.nextSibling);
-
+        const filterInput = document.getElementById('filterInput');
         filterInput.addEventListener('input', function() {
             const filterText = this.value.toLowerCase();
             const rows = document.querySelectorAll('tbody tr');

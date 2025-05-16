@@ -27,13 +27,11 @@ public class ApiClient {
         this.objectMapper = objectMapper;
     }
 
-    // Phương thức lấy dữ liệu với kiểu trả về đơn giản
     public <T> T get(String endpoint, Class<T> responseType) {
         String url = apiBaseUrl + endpoint;
         return restTemplate.getForObject(url, responseType);
     }
 
-    // Phương thức lấy dữ liệu với kiểu trả về đơn giản và query params
     public <T> T get(String endpoint, Class<T> responseType, Map<String, Object> queryParams) {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(apiBaseUrl + endpoint);
 
@@ -47,13 +45,11 @@ public class ApiClient {
         return restTemplate.getForObject(url, responseType);
     }
 
-    // Phương thức lấy dữ liệu với kiểu generic phức tạp
     public <T> ResponseEntity<T> getForEntity(String endpoint, ParameterizedTypeReference<T> responseType) {
         String url = apiBaseUrl + endpoint;
         return restTemplate.exchange(url, HttpMethod.GET, null, responseType);
     }
 
-    // Phương thức lấy dữ liệu với kiểu generic phức tạp và query params
     public <T> ResponseEntity<T> getForEntity(String endpoint, ParameterizedTypeReference<T> responseType, Map<String, Object> queryParams) {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(apiBaseUrl + endpoint);
 
@@ -67,7 +63,6 @@ public class ApiClient {
         return restTemplate.exchange(url, HttpMethod.GET, null, responseType);
     }
 
-    // Phương thức tạo dữ liệu mới
     public <T, R> R post(String endpoint, T body, Class<R> responseType) {
         String url = apiBaseUrl + endpoint;
         HttpHeaders headers = new HttpHeaders();
@@ -77,7 +72,6 @@ public class ApiClient {
         return restTemplate.postForObject(url, requestEntity, responseType);
     }
 
-    // Phương thức tạo dữ liệu mới với query params
     public <T, R> R post(String endpoint, T body, Class<R> responseType, Map<String, Object> queryParams) {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(apiBaseUrl + endpoint);
 
@@ -95,7 +89,6 @@ public class ApiClient {
         return restTemplate.postForObject(url, requestEntity, responseType);
     }
 
-    // Phương thức cập nhật dữ liệu
     public <T> void put(String endpoint, T body) {
         String url = apiBaseUrl + endpoint;
         HttpHeaders headers = new HttpHeaders();
@@ -105,7 +98,6 @@ public class ApiClient {
         restTemplate.exchange(url, HttpMethod.PUT, requestEntity, Void.class);
     }
 
-    // Phương thức cập nhật dữ liệu với query params
     public <T> void put(String endpoint, T body, Map<String, Object> queryParams) {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(apiBaseUrl + endpoint);
 
@@ -123,13 +115,11 @@ public class ApiClient {
         restTemplate.exchange(url, HttpMethod.PUT, requestEntity, Void.class);
     }
 
-    // Phương thức xóa dữ liệu
     public void delete(String endpoint) {
         String url = apiBaseUrl + endpoint;
         restTemplate.delete(url);
     }
 
-    // Phương thức xóa dữ liệu với query params
     public void delete(String endpoint, Map<String, Object> queryParams) {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(apiBaseUrl + endpoint);
 
@@ -143,7 +133,7 @@ public class ApiClient {
         restTemplate.delete(url);
     }
 
-    // Parse PageResponse (phân trang) từ API
+    // phân trang
     public <T> Map<String, Object> parsePaginatedResponse(ResponseEntity<Map<String, Object>> response, String dataKey, Class<T> elementType) {
         Map<String, Object> responseBody = response.getBody();
         if (responseBody == null) {

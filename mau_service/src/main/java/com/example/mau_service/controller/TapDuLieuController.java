@@ -89,12 +89,12 @@ public class TapDuLieuController {
     }
 
     @PostMapping("/them-moi")
-    public String themMoi(@ModelAttribute TapDuLieu tapDuLieu , @RequestParam(name = "mauIds", required = false) List<Long> mauIds) {
+    public String themMoi(@ModelAttribute TapDuLieu tapDuLieu, @RequestParam(name = "mauIds", required = false) List<Long> mauIds) {
         try {
-            for(Long id:mauIds){
-                System.out.println(id);
-            }
-            tapDuLieuService.taoTapDuLieu(tapDuLieu);
+            System.out.println("TapDuLieu: " + tapDuLieu.getTen());
+            System.out.println("MauIds: " + mauIds);
+
+            tapDuLieuService.taoTapDuLieu(tapDuLieu, mauIds);
             return "redirect:/tap-du-lieu";
         } catch (Exception e) {
             e.printStackTrace();
@@ -118,9 +118,10 @@ public class TapDuLieuController {
     }
 
     @PostMapping("/chinh-sua/{id}")
-    public String chinhSua(@PathVariable Long id, @ModelAttribute TapDuLieu tapDuLieu) {
+    public String chinhSua(@PathVariable Long id, @ModelAttribute TapDuLieu tapDuLieu,
+                           @RequestParam(name = "mauIds", required = false) List<Long> mauIds) {
         try {
-            tapDuLieuService.capNhatTapDuLieu(id, tapDuLieu);
+            tapDuLieuService.capNhatTapDuLieu(id, tapDuLieu, mauIds);
             return "redirect:/tap-du-lieu/" + id;
         } catch (Exception e) {
             e.printStackTrace();

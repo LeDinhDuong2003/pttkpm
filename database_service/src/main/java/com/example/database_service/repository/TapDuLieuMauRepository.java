@@ -11,5 +11,6 @@ public interface TapDuLieuMauRepository extends JpaRepository<TapDuLieuMau, Long
     List<TapDuLieuMau> findByTapDuLieuId(Long tapDuLieuId);
 //    List<TapDuLieuMau> findByMauBaoLucId(Long mauBaoLucId);
     void deleteByTapDuLieuIdAndMauBaoLucId(Long tapDuLieuId, Long mauBaoLucId);
+    void deleteByMauBaoLucId(Long mauBaoLucId);
     boolean existsByTapDuLieuIdAndMauBaoLucId(Long tapDuLieuId, Long mauBaoLucId);
 }

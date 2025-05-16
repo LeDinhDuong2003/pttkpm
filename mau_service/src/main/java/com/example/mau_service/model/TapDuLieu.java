@@ -17,8 +17,6 @@ public class TapDuLieu {
     private String moTa;
     private String loai; // HUAN_LUYEN, KIEM_TRA, DANH_GIA
 
-    // Danh sách mẫu trong tập dữ liệu
     private List<MauBaoLuc> danhSachMau;
-//    private List<Long> selectedMauIds = new ArrayList<>();
 
 }

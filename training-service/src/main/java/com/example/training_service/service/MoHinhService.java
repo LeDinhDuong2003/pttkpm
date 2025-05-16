@@ -76,11 +76,6 @@ public class MoHinhService {
     }
 
     public MoHinhDaHuanLuyen taoMoHinh(MoHinhDaHuanLuyen moHinh) throws Exception {
-        // Chuyển đổi thông số huấn luyện từ form thành JSON
-//        if (moHinh.getThongSoForm() != null) {
-//            String thongSoJson = objectMapper.writeValueAsString(moHinh.getThongSoForm());
-//            moHinh.setThongSoHuanLuyen(thongSoJson);
-//        }
 
         // Thiết lập trạng thái ban đầu
         moHinh.setTrangThai(0);
@@ -114,5 +109,19 @@ public class MoHinhService {
 
         // Lấy thông tin mô hình sau khi cập nhật
         return layMoHinhTheoId(id);
+    }
+
+    public void xoaMoHinh(Long id) {
+        try {
+            // Lấy thông tin mẫu để xóa file
+            MoHinhDaHuanLuyen mau = layMoHinhTheoId(id);
+
+
+            // Xóa thông tin trong database
+            apiClient.delete("/mo-hinh-da-huan-luyen/" + id);
+            System.out.println("thanh cong");
+        } catch (Exception e) {
+            throw new RuntimeException("Lỗi khi xóa mẫu bạo lực: " + e.getMessage(), e);
+        }
     }
 }

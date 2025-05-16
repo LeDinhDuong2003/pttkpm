@@ -17,6 +17,7 @@
             <h5 class="mb-0"><i class="fas fa-edit me-2"></i>Thông tin mẫu bạo lực</h5>
         </div>
         <div class="card-body">
+            <!-- Đảm bảo có enctype="multipart/form-data" để upload file -->
             <form th:action="@{/mau-bao-luc/chinh-sua/{id}(id=${mauBaoLuc.id})}" method="post" enctype="multipart/form-data" th:object="${mauBaoLuc}" class="needs-validation" novalidate>
                 <div class="row">
                     <div class="col-md-6 mb-3">
@@ -47,12 +48,19 @@
                     </div>
 
                     <div class="col-12 mb-4">
-                        <label for="videoFile" class="form-label">File Video</label>
+                        <label for="videoFile" class="form-label">File Video mới (nếu muốn thay đổi)</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-file-video"></i></span>
                             <input type="file" class="form-control" id="videoFile" name="videoFile" accept="video/*">
                         </div>
-                        <small class="form-text text-muted">Để trống nếu không muốn cập nhật video.</small>
+                        <small class="form-text text-muted">Để trống nếu không muốn thay đổi video hiện tại.</small>
+                        <div id="filePreview" class="mt-2 d-none">
+                            <div class="alert alert-info">
+                                <i class="fas fa-file-video me-2"></i>
+                                <span id="fileName"></span>
+                                <button type="button" class="btn-close float-end" id="removeFile" aria-label="Close"></button>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="col-12 mb-4" th:if="${mauBaoLuc.duongDanVideo != null}">
@@ -80,5 +88,36 @@
 </div>
 
 <footer th:replace="~{fragments/footer :: footer}"></footer>
+
+<script>
+    // Hiển thị tên file khi người dùng chọn file
+    document.addEventListener('DOMContentLoaded', function() {
+        const fileInput = document.getElementById('videoFile');
+        const filePreview = document.getElementById('filePreview');
+        const fileName = document.getElementById('fileName');
+        const removeFile = document.getElementById('removeFile');
+
+        fileInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const file = this.files[0];
+                fileName.textContent = file.name + ' (' + formatFileSize(file.size) + ')';
+                filePreview.classList.remove('d-none');
+            } else {
+                filePreview.classList.add('d-none');
+            }
+        });
+
+        removeFile.addEventListener('click', function() {
+            fileInput.value = '';
+            filePreview.classList.add('d-none');
+        });
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' bytes';
+            else if (bytes < 1048576) return (bytes / 1024).toFixed(2) + ' KB';
+            else return (bytes / 1048576).toFixed(2) + ' MB';
+        }
+    });
+</script>
 </body>
 </html>

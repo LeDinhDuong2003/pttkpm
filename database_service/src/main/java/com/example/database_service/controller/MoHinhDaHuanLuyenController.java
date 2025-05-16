@@ -33,6 +33,8 @@ public class MoHinhDaHuanLuyenController {
             @RequestParam(defaultValue = "10") int soLuong) {
 
         try {
+            System.out.println("mucDich: " + mucDich);
+            System.out.println("trangThai: " + trangThai);
             String sapXepTheo = "id";
             String huongSapXep = "asc";
             Sort.Direction huong = "desc".equalsIgnoreCase(huongSapXep) ? Sort.Direction.DESC : Sort.Direction.ASC;
@@ -40,7 +42,14 @@ public class MoHinhDaHuanLuyenController {
 
             Page<MoHinhDaHuanLuyen> pageMoHinhDaHuanLuyen;
 
-            if (mucDich != null && !mucDich.isEmpty()) {
+            if (trangThai != null && !trangThai.isEmpty() && mucDich != null && !mucDich.isEmpty()) {
+                try {
+                    Integer trangThaiEnum = Integer.parseInt(trangThai);
+                    pageMoHinhDaHuanLuyen = moHinhDaHuanLuyenService.layMoHinhDaHuanLuyenTheoTrangThaiVaMucDich(mucDich,trangThaiEnum, paging);
+                } catch (IllegalArgumentException e) {
+                    pageMoHinhDaHuanLuyen = moHinhDaHuanLuyenService.layTatCaMoHinhDaHuanLuyen(paging);
+                }
+            } else if (mucDich != null && !mucDich.isEmpty()) {
                 try {
                     String mucDichEnum = mucDich;
                     pageMoHinhDaHuanLuyen = moHinhDaHuanLuyenService.layMoHinhDaHuanLuyenTheoMucDich(mucDichEnum, paging);
