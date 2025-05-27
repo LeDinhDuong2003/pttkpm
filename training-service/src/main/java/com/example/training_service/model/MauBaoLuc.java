@@ -1,12 +1,8 @@
-package com.example.mau_service.model;
+package com.example.training_service.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor

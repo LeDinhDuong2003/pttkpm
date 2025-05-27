@@ -79,7 +79,7 @@
                                         <div class="form-check">
                                             <input class="form-check-input mau-checkbox" type="checkbox"
                                                    name="mauIds" th:value="${mau.id}"
-                                                   th:checked="${#lists.contains(tapDuLieu.danhSachMau, mau)}"
+                                                   th:checked="${mauIdsDaCo.contains(mau.id.toString())}"
                                                    th:id="${'mau_' + mau.id}">
                                         </div>
                                     </td>

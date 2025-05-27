@@ -82,8 +82,6 @@ public class MauBaoLucController {
         try {
             logger.info("Bắt đầu xử lý thêm mới mẫu bạo lực");
 
-            // Gán file video vào model để dịch vụ có thể xử lý
-//            mauBaoLuc.setVideoFile(videoFile);
 
             // Kiểm tra file có được upload không
             if (videoFile != null && !videoFile.isEmpty()) {

@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/tap-du-lieu")
@@ -109,10 +111,21 @@ public class TapDuLieuController {
         List<MauBaoLuc> danhSachMau = (List<MauBaoLuc>) result.get("mauBaoLucs");
 
         TapDuLieu tapDuLieu = tapDuLieuService.layTapDuLieuTheoId(id);
-
+        for (MauBaoLuc mau:tapDuLieu.getDanhSachMau()){
+            System.out.println("Mau: " + mau.getId());
+        }
+        Set<String> mauIdsDaCo = tapDuLieu.getDanhSachMau()
+                .stream()
+                .map(mau -> String.valueOf(mau.getId()))
+                .collect(Collectors.toSet());
+        for (String mauId : mauIdsDaCo) {
+            System.out.println("MauId: " + mauId);
+//            System.out.println(typeOf(mauId));
+        }
         model.addAttribute("tapDuLieu", tapDuLieu);
         model.addAttribute("danhSachMau", danhSachMau);
         model.addAttribute("isNew", false);
+        model.addAttribute("mauIdsDaCo", mauIdsDaCo);
 
         return "tap-du-lieu/edit";
     }

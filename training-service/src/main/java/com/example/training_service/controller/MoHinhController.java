@@ -1,6 +1,7 @@
 package com.example.training_service.controller;
 
 import com.example.training_service.model.LoaiMoHinh;
+import com.example.training_service.model.MauBaoLuc;
 import com.example.training_service.model.MoHinhDaHuanLuyen;
 import com.example.training_service.model.TapDuLieu;
 import com.example.training_service.service.HuanLuyenService;
@@ -93,7 +94,13 @@ public class MoHinhController {
     public String formHuanLuyen(@PathVariable Long id, Model model) {
         MoHinhDaHuanLuyen moHinh = moHinhService.layMoHinhTheoId(id);
 
+        List<MauBaoLuc> danhSachMau = moHinhService.layTatCaMauBaoLuc();
+
+        List<MauBaoLuc> danhSachMauHienTai = moHinhService.layDanhSachMauTrongTapDuLieu(moHinh.getTapDuLieu().getId());
+
         model.addAttribute("moHinh", moHinh);
+        model.addAttribute("danhSachMau", danhSachMau);
+        model.addAttribute("danhSachMauHienTai", danhSachMauHienTai);
         model.addAttribute("isNew", false);
 
         return "mo-hinh/train";
@@ -104,10 +111,18 @@ public class MoHinhController {
     public String huanLuyen(
             @PathVariable Long id,
             @ModelAttribute MoHinhDaHuanLuyen moHinh,
+            @RequestParam(name = "mauIds", required = false) List<Long> mauIds,
             RedirectAttributes redirectAttributes) {
 
         try {
             System.out.println("Starting training for model ID: " + id);
+
+            if (mauIds != null && !mauIds.isEmpty()) {
+                Long tapDuLieuId = moHinh.getTapDuLieu().getId();
+                moHinhService.capNhatMauTrongTapDuLieu(tapDuLieuId, mauIds);
+                System.out.println("Updated dataset with selected samples: " + mauIds.size() + " samples");
+            }
+
             boolean ketQua = huanLuyenService.batDauHuanLuyen(id);
             System.out.println("Training result: " + ketQua);
 

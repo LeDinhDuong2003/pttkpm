@@ -77,10 +77,8 @@ public class TapDuLieuService {
         // Cập nhật thông tin tập dữ liệu
         apiClient.put("/tap-du-lieu/" + id, tapDuLieu);
 
-        // Lấy danh sách mẫu hiện tại trong tập dữ liệu
         List<MauBaoLuc> danhSachMauHienTai = layDanhSachMauBaoLucTrongTapDuLieu(id);
 
-        // Nếu không có mauIds thì mặc định là không chọn mẫu nào
         List<Long> selectedMauIds = mauIds != null ? mauIds : new ArrayList<>();
 
         // Xóa các mẫu không còn được chọn

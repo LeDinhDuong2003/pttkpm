@@ -1,6 +1,7 @@
 package com.example.training_service.service;
 
 import com.example.training_service.model.LoaiMoHinh;
+import com.example.training_service.model.MauBaoLuc;
 import com.example.training_service.model.MoHinhDaHuanLuyen;
 import com.example.training_service.model.TapDuLieu;
 import com.example.training_service.util.ApiClient;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class MoHinhService {
@@ -75,24 +77,70 @@ public class MoHinhService {
         return (List<TapDuLieu>) result.get("tapDuLieus");
     }
 
-    public MoHinhDaHuanLuyen taoMoHinh(MoHinhDaHuanLuyen moHinh) throws Exception {
+    public List<MauBaoLuc> layTatCaMauBaoLuc() {
+        Map<String, Object> queryParams = new HashMap<>();
+        queryParams.put("soLuong", 1000); // Get up to 1000 samples
 
+        ResponseEntity<Map<String, Object>> response = apiClient.getEntityFromDatabase(
+                "/mau-bao-luc",
+                new ParameterizedTypeReference<Map<String, Object>>() {},
+                queryParams
+        );
+
+        Map<String, Object> result = apiClient.parsePaginatedResponse(response, "mauBaoLucs", MauBaoLuc.class);
+        return (List<MauBaoLuc>) result.get("mauBaoLucs");
+    }
+
+    public List<MauBaoLuc> layDanhSachMauTrongTapDuLieu(Long tapDuLieuId) {
+        ResponseEntity<List<MauBaoLuc>> response = apiClient.getEntityFromDatabase(
+                "/tap-du-lieu/" + tapDuLieuId + "/mau-bao-luc",
+                new ParameterizedTypeReference<List<MauBaoLuc>>() {}
+        );
+
+        return response.getBody() != null ? response.getBody() : new ArrayList<>();
+    }
+
+    public void capNhatMauTrongTapDuLieu(Long tapDuLieuId, List<Long> mauIds) {
+        // First, get current samples in the dataset
+        List<MauBaoLuc> danhSachMauHienTai = layDanhSachMauTrongTapDuLieu(tapDuLieuId);
+        List<Long> mauHienTaiIds = danhSachMauHienTai.stream()
+                .map(MauBaoLuc::getId)
+                .collect(Collectors.toList());
+
+        for (MauBaoLuc mau : danhSachMauHienTai) {
+            if (!mauIds.contains(mau.getId())) {
+                apiClient.delete("/tap-du-lieu-mau/tap-du-lieu/" + tapDuLieuId + "/mau-bao-luc/" + mau.getId());
+            }
+        }
+
+        for (Long mauId : mauIds) {
+            if (!mauHienTaiIds.contains(mauId)) {
+                apiClient.postToDatabase(
+                        "/tap-du-lieu-mau/tap-du-lieu/" + tapDuLieuId + "/mau-bao-luc/" + mauId,
+                        null,
+                        Object.class
+                );
+            }
+        }
+    }
+
+    public MoHinhDaHuanLuyen taoMoHinh(MoHinhDaHuanLuyen moHinh) throws Exception {
         // Thiết lập trạng thái ban đầu
         moHinh.setTrangThai(0);
 
         // Gọi API tạo mô hình
         Map<String, Object> queryParams = new HashMap<>();
-//        queryParams.put("nguoiDungId", moHinh.getNguoiDungId());
+        //queryParams.put("nguoiDungId", moHinh.getNguoiDungId());
 
         return apiClient.postToDatabase("/mo-hinh-da-huan-luyen", moHinh, MoHinhDaHuanLuyen.class, queryParams);
     }
 
     public MoHinhDaHuanLuyen capNhatMoHinh(Long id, MoHinhDaHuanLuyen moHinh) throws Exception {
         // Chuyển đổi thông số huấn luyện từ form thành JSON
-//        if (moHinh.getThongSoForm() != null) {
-//            String thongSoJson = objectMapper.writeValueAsString(moHinh.getThongSoForm());
-//            moHinh.setThongSoHuanLuyen(thongSoJson);
-//        }
+        // if (moHinh.getThongSoForm() != null) {
+        //     String thongSoJson = objectMapper.writeValueAsString(moHinh.getThongSoForm());
+        //     moHinh.setThongSoHuanLuyen(thongSoJson);
+        // }
 
         // Gọi API cập nhật mô hình
         apiClient.putToDatabase("/mo-hinh-da-huan-luyen/" + id, moHinh);
@@ -115,7 +163,6 @@ public class MoHinhService {
         try {
             // Lấy thông tin mẫu để xóa file
             MoHinhDaHuanLuyen mau = layMoHinhTheoId(id);
-
 
             // Xóa thông tin trong database
             apiClient.delete("/mo-hinh-da-huan-luyen/" + id);
