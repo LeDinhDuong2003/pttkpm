@@ -1,5 +1,5 @@
-// training-service/src/main/java/com/example/training_service/config/JacksonConfig.java
-package com.example.training_service.config;
+// database_service/src/main/java/com/example/database_service/config/JacksonConfig.java
+package com.example.database_service.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -23,11 +23,9 @@ public class JacksonConfig {
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
         // Debug log
-        System.out.println("=== Jackson ObjectMapper Configuration ===");
+        System.out.println("=== Database Service Jackson Configuration ===");
         System.out.println("WRITE_DATES_AS_TIMESTAMPS disabled: " +
                 !objectMapper.isEnabled(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS));
-        System.out.println("JavaTimeModule registered: " +
-                objectMapper.getRegisteredModuleIds().contains("jackson-datatype-jsr310"));
 
         return objectMapper;
     }

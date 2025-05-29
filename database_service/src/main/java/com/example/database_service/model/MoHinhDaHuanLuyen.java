@@ -1,5 +1,7 @@
+// database_service/src/main/java/com/example/database_service/model/MoHinhDaHuanLuyen.java
 package com.example.database_service.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -43,19 +45,24 @@ public class MoHinhDaHuanLuyen {
 
     private Float doChinhXac;
 
+    // Sử dụng @JsonFormat để serialize/deserialize LocalDateTime thành string
     @Column(columnDefinition = "DATETIME")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "UTC")
     private LocalDateTime thoiGianBatDau;
 
     @Column(columnDefinition = "DATETIME")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "UTC")
     private LocalDateTime thoiGianKetThuc;
 
     // Bỏ @Enumerated vì bạn dùng Integer
     private Integer trangThai;
 
     @Column(columnDefinition = "DATETIME")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "UTC")
     private LocalDateTime ngayTao;
 
     @Column(columnDefinition = "DATETIME")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "UTC")
     private LocalDateTime ngayCapNhat;
 
     @PrePersist

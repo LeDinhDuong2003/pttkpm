@@ -18,25 +18,25 @@ public class MoHinhDaHuanLuyen {
     private String ten;
     private String moTa;
     private LoaiMoHinh loaiMoHinh;
-    private String mucDich; // PHAT_HIEN_BAO_LUC, NHAN_DANG_VUNG_CHUA, NHAN_DANG_CHUYEN_DONG
+    private String mucDich;
     private String duongDanMoHinh;
-    private String thongSoHuanLuyen; // JSON chứa các thông số huấn luyện
+    private String thongSoHuanLuyen;
     private TapDuLieu tapDuLieu;
     private String phienBan;
     private Float doChinhXac;
 
-    // THÊM @JsonFormat để serialize thành string thay vì array
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    // Sử dụng @JsonFormat để serialize/deserialize thành string với timezone
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "UTC")
     private LocalDateTime thoiGianBatDau;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "UTC")
     private LocalDateTime thoiGianKetThuc;
 
-    private Integer trangThai; // DANG_HUAN_LUYEN, HOAN_THANH, LOI
+    private Integer trangThai;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "UTC")
     private LocalDateTime ngayTao;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "UTC")
     private LocalDateTime ngayCapNhat;
 }

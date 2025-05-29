@@ -123,11 +123,8 @@ public class MoHinhController {
             List<MauBaoLuc> danhSachMauDuocChon = new ArrayList<>();
 
             if (mauIds != null && !mauIds.isEmpty()) {
-                // Lấy thông tin chi tiết của các mẫu được chọn
                 for (Long mauId : mauIds) {
                     try {
-                        // Gọi API để lấy thông tin mẫu từ database service
-                        // Bạn có thể tạo method trong MoHinhService để lấy mẫu theo ID
                         MauBaoLuc mau = moHinhService.layMauBaoLucTheoId(mauId);
                         if (mau != null) {
                             danhSachMauDuocChon.add(mau);
@@ -136,18 +133,14 @@ public class MoHinhController {
                         System.out.println("Không thể lấy thông tin mẫu ID: " + mauId + " - " + e.getMessage());
                     }
                 }
-
-                // Cập nhật tập dữ liệu với các mẫu được chọn
                 Long tapDuLieuId = moHinh.getTapDuLieu().getId();
                 moHinhService.capNhatMauTrongTapDuLieu(tapDuLieuId, mauIds);
                 System.out.println("Updated dataset with selected samples: " + mauIds.size() + " samples");
             } else {
-                // Nếu không có mẫu nào được chọn, lấy tất cả mẫu từ tập dữ liệu
                 danhSachMauDuocChon = moHinhService.layDanhSachMauTrongTapDuLieu(moHinh.getTapDuLieu().getId());
                 System.out.println("Using all samples from dataset: " + danhSachMauDuocChon.size() + " samples");
             }
 
-            // Kiểm tra có mẫu để huấn luyện không
             if (danhSachMauDuocChon.isEmpty()) {
                 redirectAttributes.addFlashAttribute("errorMessage", "Không có mẫu nào để huấn luyện!");
                 return "redirect:/mo-hinh/huan-luyen/" + id;
