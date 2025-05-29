@@ -103,14 +103,26 @@
 
                 <div th:unless="${isNew}" class="card mb-4">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0"><i class="fas fa-film me-2"></i>Chọn mẫu bạo lực</h5>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="selectAll">
-                            <label class="form-check-label" for="selectAll">Chọn tất cả</label>
+                        <h5 class="mb-0"><i class="fas fa-film me-2"></i>Chọn mẫu bạo lực để huấn luyện</h5>
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="badge bg-info" id="selectedCount">0 mẫu được chọn</span>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="selectAll">
+                                <label class="form-check-label" for="selectAll">Chọn tất cả</label>
+                            </div>
                         </div>
                     </div>
                     <div class="p-3">
-                        <input type="text" id="filterInput" class="form-control" placeholder="Lọc theo tên hoặc nhãn...">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <input type="text" id="filterInput" class="form-control" placeholder="Lọc theo tên hoặc nhãn...">
+                            </div>
+                            <div class="col-md-4">
+                                <select id="labelFilter" class="form-select">
+                                    <option value="">Tất cả nhãn</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                     <div class="card-body p-0">
                         <div class="table-responsive">
@@ -121,6 +133,7 @@
                                     <th>ID</th>
                                     <th>Tên</th>
                                     <th>Nhãn</th>
+                                    <th width="100px" class="text-center">Video</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -138,9 +151,21 @@
                                     <td>
                                         <span class="badge bg-primary mau-nhan" th:text="${mau.nhan}"></span>
                                     </td>
+                                    <td class="text-center">
+                                        <button type="button" class="btn btn-sm btn-outline-info"
+                                                th:if="${mau.duongDanVideo != null}"
+                                                onclick="previewVideo(this)"
+                                                th:data-video-url="${mau.duongDanVideo}"
+                                                th:data-video-name="${mau.ten}">
+                                            <i class="fas fa-play"></i>
+                                        </button>
+                                        <span th:if="${mau.duongDanVideo == null}" class="text-muted">
+                                            <i class="fas fa-times"></i>
+                                        </span>
+                                    </td>
                                 </tr>
                                 <tr th:if="${#lists.isEmpty(danhSachMau)}">
-                                    <td colspan="4" class="text-center py-4">
+                                    <td colspan="5" class="text-center py-4">
                                         <i class="fas fa-film fa-2x text-muted mb-3"></i>
                                         <p class="text-muted">Không có mẫu bạo lực nào</p>
                                     </td>
@@ -150,8 +175,19 @@
                         </div>
                     </div>
                     <div class="card-footer">
-                        <div class="text-muted small">
-                            <i class="fas fa-info-circle me-1"></i> Chọn các mẫu bạo lực để huấn luyện mô hình
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="text-muted small">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Chọn các mẫu bạo lực để huấn luyện mô hình.
+                                    Nếu không chọn mẫu nào, hệ thống sẽ sử dụng tất cả mẫu trong tập dữ liệu.
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <span class="text-muted small">
+                                    Tổng: <span th:text="${#lists.size(danhSachMau)}">0</span> mẫu có sẵn
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -165,11 +201,29 @@
                         <i class="fas fa-save me-2"></i>Tạo mô hình
                     </button>
 
-                    <button type="submit" class="btn btn-success" th:unless="${isNew}" onclick="return confirm('Bạn có chắc chắn muốn bắt đầu huấn luyện mô hình này?');">
+                    <button type="submit" class="btn btn-success" th:unless="${isNew}" onclick="return confirmTraining();">
                         <i class="fas fa-play me-2"></i>Bắt đầu huấn luyện
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal xem trước video -->
+<div class="modal fade" id="videoPreviewModal" tabindex="-1" aria-labelledby="videoPreviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="videoPreviewModalLabel">Xem trước video</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <video id="previewVideo" class="w-100" controls style="max-height: 400px;">
+                    <source src="" type="video/mp4">
+                    Trình duyệt của bạn không hỗ trợ thẻ video.
+                </video>
+            </div>
         </div>
     </div>
 </div>
@@ -181,55 +235,125 @@
         // Xử lý checkbox "Chọn tất cả"
         const selectAllCheckbox = document.getElementById('selectAll');
         const mauCheckboxes = document.querySelectorAll('.mau-checkbox');
+        const selectedCountSpan = document.getElementById('selectedCount');
+
+        function updateSelectedCount() {
+            const selectedCount = Array.from(mauCheckboxes).filter(cb => cb.checked).length;
+            if (selectedCountSpan) {
+                selectedCountSpan.textContent = selectedCount + ' mẫu được chọn';
+                selectedCountSpan.className = selectedCount > 0 ? 'badge bg-success' : 'badge bg-info';
+            }
+        }
 
         if (selectAllCheckbox) {
-            // Kiểm tra ban đầu - nếu tất cả đã được chọn, đánh dấu checkbox "Chọn tất cả"
+            // Kiểm tra ban đầu
             const allChecked = Array.from(mauCheckboxes).every(cb => cb.checked);
             const anyChecked = Array.from(mauCheckboxes).some(cb => cb.checked);
 
             selectAllCheckbox.checked = allChecked;
             selectAllCheckbox.indeterminate = anyChecked && !allChecked;
+            updateSelectedCount();
 
             selectAllCheckbox.addEventListener('change', function() {
                 const isChecked = this.checked;
-
                 mauCheckboxes.forEach(checkbox => {
-                    checkbox.checked = isChecked;
+                    if (checkbox.closest('.mau-item').style.display !== 'none') {
+                        checkbox.checked = isChecked;
+                    }
                 });
+                updateSelectedCount();
             });
 
-            // Cập nhật trạng thái checkbox "Chọn tất cả" khi người dùng chọn từng mẫu
+            // Cập nhật trạng thái checkbox "Chọn tất cả"
             mauCheckboxes.forEach(checkbox => {
                 checkbox.addEventListener('change', function() {
-                    const allChecked = Array.from(mauCheckboxes).every(cb => cb.checked);
-                    const anyChecked = Array.from(mauCheckboxes).some(cb => cb.checked);
+                    const visibleCheckboxes = Array.from(mauCheckboxes).filter(cb =>
+                        cb.closest('.mau-item').style.display !== 'none'
+                    );
+                    const allChecked = visibleCheckboxes.every(cb => cb.checked);
+                    const anyChecked = visibleCheckboxes.some(cb => cb.checked);
 
                     selectAllCheckbox.checked = allChecked;
                     selectAllCheckbox.indeterminate = anyChecked && !allChecked;
+                    updateSelectedCount();
                 });
             });
         }
 
-        // Thêm tính năng lọc theo nhãn hoặc tên
+        // Tính năng lọc
         const filterInput = document.getElementById('filterInput');
-        if (filterInput) {
-            filterInput.addEventListener('input', function() {
-                const filterText = this.value.toLowerCase();
+        const labelFilter = document.getElementById('labelFilter');
+
+        if (filterInput && labelFilter) {
+            // Tạo danh sách nhãn duy nhất
+            const uniqueLabels = [...new Set(Array.from(document.querySelectorAll('.mau-nhan')).map(el => el.textContent))];
+            uniqueLabels.forEach(label => {
+                const option = document.createElement('option');
+                option.value = label;
+                option.textContent = label;
+                labelFilter.appendChild(option);
+            });
+
+            function filterSamples() {
+                const filterText = filterInput.value.toLowerCase();
+                const selectedLabel = labelFilter.value;
                 const rows = document.querySelectorAll('.mau-item');
 
                 rows.forEach(row => {
                     const ten = row.querySelector('.mau-ten')?.textContent.toLowerCase() || '';
-                    const nhan = row.querySelector('.mau-nhan')?.textContent.toLowerCase() || '';
+                    const nhan = row.querySelector('.mau-nhan')?.textContent || '';
 
-                    if (ten.includes(filterText) || nhan.includes(filterText)) {
+                    const textMatch = ten.includes(filterText);
+                    const labelMatch = !selectedLabel || nhan === selectedLabel;
+
+                    if (textMatch && labelMatch) {
                         row.style.display = '';
                     } else {
                         row.style.display = 'none';
                     }
                 });
-            });
+            }
+
+            filterInput.addEventListener('input', filterSamples);
+            labelFilter.addEventListener('change', filterSamples);
         }
     });
+
+    function previewVideo(button) {
+        const videoUrl = button.getAttribute('data-video-url');
+        const videoName = button.getAttribute('data-video-name');
+
+        if (videoUrl) {
+            const modal = new bootstrap.Modal(document.getElementById('videoPreviewModal'));
+            const video = document.getElementById('previewVideo');
+            const modalTitle = document.getElementById('videoPreviewModalLabel');
+
+            video.src = videoUrl;
+            modalTitle.textContent = 'Xem trước: ' + videoName;
+
+            modal.show();
+
+            // Dừng video khi đóng modal
+            document.getElementById('videoPreviewModal').addEventListener('hidden.bs.modal', function () {
+                video.pause();
+                video.currentTime = 0;
+            });
+        }
+    }
+
+    function confirmTraining() {
+        const selectedCheckboxes = document.querySelectorAll('.mau-checkbox:checked');
+        const selectedCount = selectedCheckboxes.length;
+
+        let message;
+        if (selectedCount === 0) {
+            message = 'Bạn chưa chọn mẫu nào. Hệ thống sẽ sử dụng tất cả mẫu trong tập dữ liệu để huấn luyện.\n\nBạn có chắc chắn muốn tiếp tục?';
+        } else {
+            message = `Bạn đã chọn ${selectedCount} mẫu để huấn luyện mô hình.\n\nBạn có chắc chắn muốn bắt đầu quá trình huấn luyện?`;
+        }
+
+        return confirm(message);
+    }
 
     function validateForm() {
         // Thêm các xác thực biểu mẫu nếu cần

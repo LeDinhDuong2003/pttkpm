@@ -1,3 +1,4 @@
+// training-service/src/main/java/com/example/training_service/controller/MoHinhController.java
 package com.example.training_service.controller;
 
 import com.example.training_service.model.LoaiMoHinh;
@@ -12,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -117,17 +119,47 @@ public class MoHinhController {
         try {
             System.out.println("Starting training for model ID: " + id);
 
+            // Lấy danh sách mẫu được chọn
+            List<MauBaoLuc> danhSachMauDuocChon = new ArrayList<>();
+
             if (mauIds != null && !mauIds.isEmpty()) {
+                // Lấy thông tin chi tiết của các mẫu được chọn
+                for (Long mauId : mauIds) {
+                    try {
+                        // Gọi API để lấy thông tin mẫu từ database service
+                        // Bạn có thể tạo method trong MoHinhService để lấy mẫu theo ID
+                        MauBaoLuc mau = moHinhService.layMauBaoLucTheoId(mauId);
+                        if (mau != null) {
+                            danhSachMauDuocChon.add(mau);
+                        }
+                    } catch (Exception e) {
+                        System.out.println("Không thể lấy thông tin mẫu ID: " + mauId + " - " + e.getMessage());
+                    }
+                }
+
+                // Cập nhật tập dữ liệu với các mẫu được chọn
                 Long tapDuLieuId = moHinh.getTapDuLieu().getId();
                 moHinhService.capNhatMauTrongTapDuLieu(tapDuLieuId, mauIds);
                 System.out.println("Updated dataset with selected samples: " + mauIds.size() + " samples");
+            } else {
+                // Nếu không có mẫu nào được chọn, lấy tất cả mẫu từ tập dữ liệu
+                danhSachMauDuocChon = moHinhService.layDanhSachMauTrongTapDuLieu(moHinh.getTapDuLieu().getId());
+                System.out.println("Using all samples from dataset: " + danhSachMauDuocChon.size() + " samples");
             }
 
-            boolean ketQua = huanLuyenService.batDauHuanLuyen(id);
+            // Kiểm tra có mẫu để huấn luyện không
+            if (danhSachMauDuocChon.isEmpty()) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Không có mẫu nào để huấn luyện!");
+                return "redirect:/mo-hinh/huan-luyen/" + id;
+            }
+
+            // Bắt đầu huấn luyện với danh sách mẫu
+            boolean ketQua = huanLuyenService.batDauHuanLuyen(id, danhSachMauDuocChon);
             System.out.println("Training result: " + ketQua);
 
             if (ketQua) {
-                redirectAttributes.addFlashAttribute("successMessage", "Đã bắt đầu huấn luyện mô hình thành công!");
+                redirectAttributes.addFlashAttribute("successMessage",
+                        "Đã bắt đầu huấn luyện mô hình thành công với " + danhSachMauDuocChon.size() + " mẫu!");
             } else {
                 redirectAttributes.addFlashAttribute("errorMessage", "Có lỗi xảy ra khi bắt đầu huấn luyện mô hình.");
             }

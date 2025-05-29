@@ -1,3 +1,4 @@
+// training-service/src/main/java/com/example/training_service/service/MoHinhService.java
 package com.example.training_service.service;
 
 import com.example.training_service.model.LoaiMoHinh;
@@ -91,6 +92,16 @@ public class MoHinhService {
         return (List<MauBaoLuc>) result.get("mauBaoLucs");
     }
 
+    // THÊM MỚI: Method để lấy thông tin mẫu bạo lực theo ID
+    public MauBaoLuc layMauBaoLucTheoId(Long id) {
+        try {
+            return apiClient.getFromDatabase("/mau-bao-luc/" + id, MauBaoLuc.class);
+        } catch (Exception e) {
+            System.out.println("Error fetching sample with ID " + id + ": " + e.getMessage());
+            return null;
+        }
+    }
+
     public List<MauBaoLuc> layDanhSachMauTrongTapDuLieu(Long tapDuLieuId) {
         ResponseEntity<List<MauBaoLuc>> response = apiClient.getEntityFromDatabase(
                 "/tap-du-lieu/" + tapDuLieuId + "/mau-bao-luc",
@@ -130,18 +141,11 @@ public class MoHinhService {
 
         // Gọi API tạo mô hình
         Map<String, Object> queryParams = new HashMap<>();
-        //queryParams.put("nguoiDungId", moHinh.getNguoiDungId());
 
         return apiClient.postToDatabase("/mo-hinh-da-huan-luyen", moHinh, MoHinhDaHuanLuyen.class, queryParams);
     }
 
     public MoHinhDaHuanLuyen capNhatMoHinh(Long id, MoHinhDaHuanLuyen moHinh) throws Exception {
-        // Chuyển đổi thông số huấn luyện từ form thành JSON
-        // if (moHinh.getThongSoForm() != null) {
-        //     String thongSoJson = objectMapper.writeValueAsString(moHinh.getThongSoForm());
-        //     moHinh.setThongSoHuanLuyen(thongSoJson);
-        // }
-
         // Gọi API cập nhật mô hình
         apiClient.putToDatabase("/mo-hinh-da-huan-luyen/" + id, moHinh);
 

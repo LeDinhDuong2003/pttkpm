@@ -1,5 +1,7 @@
+// training-service/src/main/java/com/example/training_service/model/MoHinhDaHuanLuyen.java
 package com.example.training_service.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,10 +24,19 @@ public class MoHinhDaHuanLuyen {
     private TapDuLieu tapDuLieu;
     private String phienBan;
     private Float doChinhXac;
-    private LocalDateTime thoiGianBatDau;
-    private LocalDateTime thoiGianKetThuc;
-    private Integer trangThai; // DANG_HUAN_LUYEN, HOAN_THANH, LOI
-    private LocalDateTime ngayTao;
-    private LocalDateTime ngayCapNhat;
 
+    // THÊM @JsonFormat để serialize thành string thay vì array
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private LocalDateTime thoiGianBatDau;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private LocalDateTime thoiGianKetThuc;
+
+    private Integer trangThai; // DANG_HUAN_LUYEN, HOAN_THANH, LOI
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private LocalDateTime ngayTao;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private LocalDateTime ngayCapNhat;
 }
