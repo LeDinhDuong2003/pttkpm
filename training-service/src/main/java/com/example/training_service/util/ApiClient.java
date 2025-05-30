@@ -1,7 +1,6 @@
 // training-service/src/main/java/com/example/training_service/util/ApiClient.java
 package com.example.training_service.util;
 
-import com.example.training_service.dto.TrainingRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -115,13 +114,13 @@ public class ApiClient {
         restTemplate.exchange(url, HttpMethod.PUT, requestEntity, Void.class);
     }
 
-    // CẬP NHẬT: Method mới để gửi training request với mô hình và danh sách mẫu
-    public ResponseEntity<Map<String, Object>> requestTraining(TrainingRequest trainingRequest) {
+    // UPDATED: Method mới để gửi training request với Map thay vì TrainingRequest class
+    public ResponseEntity<Map<String, Object>> requestTraining(Map<String, Object> requestPayload) {
         String url = apiTrainingProcessorUrl + "/api/train";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        HttpEntity<TrainingRequest> requestEntity = new HttpEntity<>(trainingRequest, headers);
+        HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestPayload, headers);
         return restTemplate.exchange(url, HttpMethod.POST, requestEntity, new ParameterizedTypeReference<Map<String, Object>>() {});
     }
 

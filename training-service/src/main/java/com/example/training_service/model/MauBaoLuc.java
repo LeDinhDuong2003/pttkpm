@@ -13,9 +13,4 @@ public class MauBaoLuc {
     private String moTa;
     private String duongDanVideo;
     private String nhan;
-//    private LocalDateTime ngayTao;
-//    private LocalDateTime ngayCapNhat;
-
-//    @JsonIgnore
-//    private transient MultipartFile videoFile;
 }

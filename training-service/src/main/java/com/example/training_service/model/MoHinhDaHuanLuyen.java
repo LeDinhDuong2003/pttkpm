@@ -25,7 +25,6 @@ public class MoHinhDaHuanLuyen {
     private String phienBan;
     private Float doChinhXac;
 
-    // Sử dụng @JsonFormat để serialize/deserialize thành string với timezone
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "UTC")
     private LocalDateTime thoiGianBatDau;
 

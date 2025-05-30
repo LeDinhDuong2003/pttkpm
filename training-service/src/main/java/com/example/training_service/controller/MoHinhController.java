@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -119,23 +120,28 @@ public class MoHinhController {
         try {
             System.out.println("Starting training for model ID: " + id);
 
-            // Lấy danh sách mẫu được chọn
             List<MauBaoLuc> danhSachMauDuocChon = new ArrayList<>();
 
             if (mauIds != null && !mauIds.isEmpty()) {
+                System.out.println("Selected sample IDs: " + mauIds);
+
                 for (Long mauId : mauIds) {
                     try {
                         MauBaoLuc mau = moHinhService.layMauBaoLucTheoId(mauId);
                         if (mau != null) {
                             danhSachMauDuocChon.add(mau);
+                            System.out.println("Added sample: ID=" + mau.getId() + ", Name=" + mau.getTen() + ", Label=" + mau.getNhan());
+                        } else {
+                            System.out.println("Sample not found: ID=" + mauId);
                         }
                     } catch (Exception e) {
-                        System.out.println("Không thể lấy thông tin mẫu ID: " + mauId + " - " + e.getMessage());
+                        System.out.println("Error fetching sample ID: " + mauId + " - " + e.getMessage());
                     }
                 }
+
                 Long tapDuLieuId = moHinh.getTapDuLieu().getId();
                 moHinhService.capNhatMauTrongTapDuLieu(tapDuLieuId, mauIds);
-                System.out.println("Updated dataset with selected samples: " + mauIds.size() + " samples");
+                System.out.println("Updated dataset " + tapDuLieuId + " with " + mauIds.size() + " selected samples");
             } else {
                 danhSachMauDuocChon = moHinhService.layDanhSachMauTrongTapDuLieu(moHinh.getTapDuLieu().getId());
                 System.out.println("Using all samples from dataset: " + danhSachMauDuocChon.size() + " samples");
@@ -146,13 +152,27 @@ public class MoHinhController {
                 return "redirect:/mo-hinh/huan-luyen/" + id;
             }
 
-            // Bắt đầu huấn luyện với danh sách mẫu
-            boolean ketQua = huanLuyenService.batDauHuanLuyen(id, danhSachMauDuocChon);
-            System.out.println("Training result: " + ketQua);
+            System.out.println("=== TRAINING DATA SUMMARY ===");
+            System.out.println("Model ID: " + id);
+            System.out.println("Total samples to train: " + danhSachMauDuocChon.size());
+
+            Map<String, Integer> labelCount = new HashMap<>();
+            for (MauBaoLuc mau : danhSachMauDuocChon) {
+                String label = mau.getNhan();
+                labelCount.put(label, labelCount.getOrDefault(label, 0) + 1);
+                System.out.println("Sample: ID=" + mau.getId() + ", Name=" + mau.getTen() +
+                        ", Label=" + label + ", Video=" + mau.getDuongDanVideo());
+            }
+
+            System.out.println("Label distribution: " + labelCount);
+            System.out.println("==============================");
+            boolean ketQua = huanLuyenService.batDauHuanLuyen(moHinh, danhSachMauDuocChon);
+            System.out.println("Training request result: " + ketQua);
 
             if (ketQua) {
                 redirectAttributes.addFlashAttribute("successMessage",
-                        "Đã bắt đầu huấn luyện mô hình thành công với " + danhSachMauDuocChon.size() + " mẫu!");
+                        "Đã bắt đầu huấn luyện mô hình thành công với " + danhSachMauDuocChon.size() + " mẫu! " +
+                                "Phân bố nhãn: " + labelCount);
             } else {
                 redirectAttributes.addFlashAttribute("errorMessage", "Có lỗi xảy ra khi bắt đầu huấn luyện mô hình.");
             }
